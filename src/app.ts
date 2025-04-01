@@ -5,6 +5,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import ExpressMongoSanitize from "express-mongo-sanitize";
+import authRouter from "./routes/authRouter.ts";
 
 const app = Express();
 
@@ -25,11 +26,12 @@ app.use(limiter);
 app.use(Express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "Welcome to the API!",
-  });
+app.use("/", (req, res, next) => {
+  console.log("Data received:", req.body);
+
+  next();
 });
+
+app.use("/api/v1/auth", authRouter);
 
 export default app;

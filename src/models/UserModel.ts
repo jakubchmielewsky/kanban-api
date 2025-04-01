@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -12,7 +13,9 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: [true, "Password is required"],
+    select: false,
+    minLength: [8, "Password must be at least 8 characters"],
   },
   passwordConfirm: {
     type: String,
@@ -25,6 +28,17 @@ const userSchema = new mongoose.Schema({
       message: "Passwords do not match",
     },
   },
+});
+
+userSchema.pre("save", async function (this: any, next: any) {
+  // Only run this function if password was actually modified
+  if (!this.isModified("password")) return next();
+
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
+  this.passwordConfirm = undefined;
+
+  next();
 });
 
 const User = mongoose.model("User", userSchema);
