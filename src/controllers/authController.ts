@@ -1,9 +1,14 @@
 import User from "../models/UserModel";
 import { Request, Response } from "express";
-import { signToken } from "../utils/jwt.ts";
+import { signToken } from "../utils/jwt";
+import UserInterface from "../interfaces/UserInterface";
 
-const createAndSendToken = (user: any, statusCode: number, res: Response) => {
-  const token = signToken(user._id);
+const createAndSendToken = (
+  user: UserInterface,
+  statusCode: number,
+  res: Response
+) => {
+  const token = signToken(user._id as string);
   const cookieOptions = {
     expires: new Date(
       Date.now() +
@@ -61,11 +66,18 @@ export async function loginUser(req: Request, res: Response, next: any) {
 
     const user = await User.findOne({ email }).select("+password");
 
-    if (!user) return next(new Error("Incorrect email or password!"));
+    if (!user || !(await user.correctPassword(password, user.password)))
+      return next(new Error("Incorrect email or password!"));
 
-    const isPasswordCorrect = await user.correctPassword(
-      password,
-      user.password
-    );
+    createAndSendToken(user, 200, res);
   } catch (error) {}
+}
+
+export async function logoutUser(req: Request, res: Response) {
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({ status: "success" });
 }

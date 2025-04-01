@@ -5,7 +5,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import ExpressMongoSanitize from "express-mongo-sanitize";
-import authRouter from "./routes/authRouter.ts";
+import authRouter from "./routes/authRouter";
 
 const app = Express();
 
@@ -28,7 +28,7 @@ app.use(cookieParser());
 
 //testing middleware
 app.use("/", (req, res, next) => {
-  console.log("Data received:", req.cookies);
+  //console.log("Data received:", req.cookies);
 
   next();
 });
