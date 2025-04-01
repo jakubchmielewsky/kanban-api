@@ -26,8 +26,9 @@ app.use(limiter);
 app.use(Express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
+//testing middleware
 app.use("/", (req, res, next) => {
-  console.log("Data received:", req.body);
+  console.log("Data received:", req.cookies);
 
   next();
 });
