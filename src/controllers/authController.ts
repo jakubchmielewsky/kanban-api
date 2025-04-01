@@ -51,3 +51,21 @@ export async function registerUser(req: Request, res: Response) {
     });
   }
 }
+
+export async function loginUser(req: Request, res: Response, next: any) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password)
+      return next(new Error("Please provide email and password!"));
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) return next(new Error("Incorrect email or password!"));
+
+    const isPasswordCorrect = await user.correctPassword(
+      password,
+      user.password
+    );
+  } catch (error) {}
+}

@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
+import UserInterface from "../interfaces/UserInterface";
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema<UserInterface>({
   email: {
     type: String,
     required: [true, "Email is required"],
@@ -22,7 +23,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     validate: {
       // This only works on CREATE and SAVE!!!
-      validator: function (this: any, val: string) {
+      validator: function (this: UserInterface, val: string) {
         return val === this.password;
       },
       message: "Passwords do not match",
@@ -30,7 +31,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre("save", async function (this: any, next: any) {
+userSchema.pre("save", async function (this: UserInterface, next) {
   // Only run this function if password was actually modified
   if (!this.isModified("password")) return next();
 
@@ -41,6 +42,13 @@ userSchema.pre("save", async function (this: any, next: any) {
 
   next();
 });
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword: string,
+  userPassword: string
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;
