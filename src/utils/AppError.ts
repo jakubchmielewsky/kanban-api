@@ -1,6 +1,6 @@
 export default class AppError extends Error {
   public statusCode: number;
-  public status: string;
+  public status: "fail" | "error";
   public isOperational: boolean;
 
   constructor(message: string, statusCode: number) {

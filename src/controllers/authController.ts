@@ -2,6 +2,8 @@ import User from "../models/UserModel";
 import { Request, Response } from "express";
 import { signToken } from "../utils/jwt";
 import UserInterface from "../interfaces/UserInterface";
+import catchAsync from "../utils/catchAsync";
+import AppError from "../utils/AppError";
 
 const createAndSendToken = (
   user: UserInterface,
@@ -38,42 +40,35 @@ const createAndSendToken = (
   res.status(statusCode).json(responseData);
 };
 
-export async function registerUser(req: Request, res: Response) {
-  try {
-    const { email, password, passwordConfirm } = req.body;
+export const registerUser = catchAsync(async (req: Request, res: Response) => {
+  const { email, password, passwordConfirm } = req.body;
 
-    const newUser = await User.create({
-      email,
-      password,
-      passwordConfirm,
-    });
+  const newUser = await User.create({
+    email,
+    password,
+    passwordConfirm,
+  });
 
-    createAndSendToken(newUser, 201, res);
-  } catch (error: any) {
-    res.status(400).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-}
+  createAndSendToken(newUser, 201, res);
+});
 
-export async function loginUser(req: Request, res: Response, next: any) {
-  try {
+export const loginUser = catchAsync(
+  async (req: Request, res: Response, next: any) => {
     const { email, password } = req.body;
 
     if (!email || !password)
-      return next(new Error("Please provide email and password!"));
+      return next(new AppError("Please provide email and password!", 400));
 
     const user = await User.findOne({ email }).select("+password");
 
     if (!user || !(await user.correctPassword(password, user.password)))
-      return next(new Error("Incorrect email or password!"));
+      return next(new AppError("Incorrect email or password!", 401));
 
     createAndSendToken(user, 200, res);
-  } catch (error) {}
-}
+  }
+);
 
-export async function logoutUser(req: Request, res: Response) {
+export function logoutUser(req: Request, res: Response) {
   res.cookie("jwt", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
