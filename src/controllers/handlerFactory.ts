@@ -3,6 +3,7 @@ import { Model, PopulateOptions } from "mongoose";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/AppError";
 import UserInterface from "../interfaces/UserInterface";
+import Board from "../models/BoardModel";
 
 export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -27,7 +28,11 @@ export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
 
 export const createOne = (Model: Model<any>) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const doc = await Model.create(req.body);
+    let data = req.body;
+    if (Model === Board)
+      data = { ...req.body, owner: res.locals.user.id.toString() };
+
+    const doc = await Model.create(data);
 
     res.status(201).json({
       status: "success",

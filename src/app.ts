@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import ExpressMongoSanitize from "express-mongo-sanitize";
 import usersRouter from "./routes/usersRouter";
 import globalErrorController from "./controllers/globalErrorController";
+import boardsRouter from "./routes/boardsRouter";
 
 const app = Express();
 
@@ -35,6 +36,7 @@ app.use("/", (req, res, next) => {
 });
 
 app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/boards", boardsRouter);
 
 app.use(globalErrorController);
 
