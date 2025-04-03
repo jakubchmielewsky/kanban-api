@@ -24,8 +24,6 @@ const protect = catchAsync(
       process.env.JWT_SECRET as string
     )) as JwtPayload;
 
-    console.log(decodedTokenData);
-
     const currentUser = await User.findById(decodedTokenData.id);
 
     if (!currentUser) {
