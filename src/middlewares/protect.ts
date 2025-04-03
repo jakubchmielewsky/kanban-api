@@ -9,8 +9,7 @@ const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
   let token: string;
   if (
     process.env.NODE_ENV === "development" &&
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
+    req.headers.authorization?.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
   } else if (req.cookies.jwt) {
