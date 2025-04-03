@@ -4,6 +4,7 @@ import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/AppError";
 import UserInterface from "../interfaces/UserInterface";
 import Board from "../models/BoardModel";
+import Column from "../models/ColumnModel";
 
 export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -29,8 +30,10 @@ export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
 export const createOne = (Model: Model<any>) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     let data = req.body;
-    if (Model === Board)
-      data = { ...req.body, owner: res.locals.user.id.toString() };
+
+    //not sure if parent referencing is needed
+    if (Model === Board) data = { ...req.body, owner: res.locals.user.id };
+    if (Model === Column) data = { ...req.body, board: req.params.id };
 
     const doc = await Model.create(data);
 
@@ -76,10 +79,14 @@ export const deleteOne = (Model: Model<any>) =>
   });
 
 //only for testing
-export const getAll = (Model: Model<any>, searchObject?: Object) =>
+export const getAll = (Model: Model<any>) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    let docs;
-    docs = searchObject ? await Model.find(searchObject) : await Model.find();
+    let searchObject = {};
+
+    if (Model === Board) searchObject = { owner: res.locals.user._id };
+    if (Model === Column) searchObject = { board: req.params.id };
+
+    const docs = await Model.find(searchObject);
 
     res.status(200).json({
       status: "success",

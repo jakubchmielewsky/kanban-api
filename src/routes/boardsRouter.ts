@@ -7,8 +7,12 @@ import {
   getBoard,
   updateBoard,
 } from "../controllers/boardsController";
+import columnsRouter from "./columnsRouter";
 
 const boardsRouter = Express.Router();
+
+//redirects /api/boards/:id/columns to columns router and allows to grab board id param
+boardsRouter.use("/:id/columns", columnsRouter);
 
 boardsRouter.use(protect);
 

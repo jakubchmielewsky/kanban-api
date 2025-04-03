@@ -8,9 +8,9 @@ import {
 import Board from "../models/BoardModel";
 import catchAsync from "../utils/catchAsync";
 import { NextFunction, Request, Response } from "express";
+import Column from "../models/ColumnModel";
 
-export const getAllBoards = getAll(Board);
-export const getBoard = getOne(Board);
-export const createBoard = createOne(Board);
-export const updateBoard = updateOne(Board);
-export const deleteBoard = deleteOne(Board);
+export const getAllColumns = getAll(Column);
+export const createColumn = createOne(Column);
+export const updateColumn = updateOne(Column);
+export const deleteColumn = deleteOne(Column);
