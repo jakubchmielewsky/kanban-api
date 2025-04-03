@@ -76,9 +76,10 @@ export const deleteOne = (Model: Model<any>) =>
   });
 
 //only for testing
-export const getAll = (Model: Model<any>) =>
+export const getAll = (Model: Model<any>, searchObject?: Object) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const docs = await Model.find();
+    let docs;
+    docs = searchObject ? await Model.find(searchObject) : await Model.find();
 
     res.status(200).json({
       status: "success",
