@@ -5,7 +5,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import ExpressMongoSanitize from "express-mongo-sanitize";
-import authRouter from "./routes/authRouter";
+import usersRouter from "./routes/usersRouter";
 import globalErrorController from "./controllers/globalErrorController";
 
 const app = Express();
@@ -34,7 +34,7 @@ app.use("/", (req, res, next) => {
   next();
 });
 
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", usersRouter);
 
 app.use(globalErrorController);
 

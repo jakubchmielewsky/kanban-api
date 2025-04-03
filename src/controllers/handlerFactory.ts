@@ -2,10 +2,16 @@ import { Request, Response, NextFunction } from "express";
 import { Model, PopulateOptions } from "mongoose";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/AppError";
+import UserInterface from "../interfaces/UserInterface";
 
-export const getOne = (Model: Model<any>, populateOptions: PopulateOptions) =>
+export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const doc = await Model.findById(req.params).populate(populateOptions);
+    let doc: UserInterface | null;
+    if (populateOptions) {
+      doc = await Model.findById(req.params.id).populate(populateOptions);
+    } else {
+      doc = await Model.findById(req.params.id);
+    }
 
     if (!doc) {
       return next(new AppError("No document found with that ID", 404));
