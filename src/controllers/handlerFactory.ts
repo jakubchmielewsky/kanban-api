@@ -31,13 +31,7 @@ export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
 
 export const createOne = (Model: Model<any>) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    let data = req.body;
-
-    //not sure if parent referencing is needed
-    if (Model === Board) data = { ...req.body, owner: res.locals.user.id };
-    if (Model === Column) data = { ...req.body, board: req.params.id };
-    if (Model === Task) data = { ...req.body, column: req.params.id };
-    if (Model === Subtask) data = { ...req.body, task: req.params.id };
+    const data = { ...req.body, ...res.locals.parentReference };
 
     const doc = await Model.create(data);
 
@@ -82,15 +76,10 @@ export const deleteOne = (Model: Model<any>) =>
     });
   });
 
-//only for testing
+//returns all documents of a model if no id is provided in the request params - possibly a security issue !!!
 export const getAll = (Model: Model<any>) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    let searchObject = {};
-
-    if (Model === Board) searchObject = { owner: res.locals.user._id };
-    if (Model === Column) searchObject = { board: req.params.id };
-    if (Model === Task) searchObject = { column: req.params.id };
-    if (Model === Subtask) searchObject = { task: req.params.id };
+    const searchObject = res.locals.parentReference;
 
     const docs = await Model.find(searchObject);
 

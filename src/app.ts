@@ -1,4 +1,4 @@
-import Express from "express";
+import Express, { Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
@@ -10,6 +10,8 @@ import globalErrorController from "./controllers/globalErrorController";
 import boardsRouter from "./routes/boardsRouter";
 import columnsRouter from "./routes/columnsRouter";
 import tasksRouter from "./routes/tasksRouter";
+import subtasksRouter from "./routes/subtasksRouter";
+import AppError from "./utils/AppError";
 
 const app = Express();
 
@@ -41,6 +43,11 @@ app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/boards", boardsRouter);
 app.use("/api/v1/columns", columnsRouter);
 app.use("/api/v1/tasks", tasksRouter);
+app.use("/api/v1/subtasks", subtasksRouter);
+
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
+  next(new AppError(`Can't find ${req.originalUrl}`, 404));
+});
 
 app.use(globalErrorController);
 

@@ -8,6 +8,8 @@ import {
   updateBoard,
 } from "../controllers/boardsController";
 import columnsRouter from "./columnsRouter";
+import setParentReferenceIds from "../middlewares/setParentReferenceIds";
+import Board from "../models/BoardModel";
 
 const boardsRouter = Express.Router();
 
@@ -15,6 +17,8 @@ const boardsRouter = Express.Router();
 boardsRouter.use("/:id/columns", columnsRouter);
 
 boardsRouter.use(protect);
+
+boardsRouter.use(setParentReferenceIds(Board));
 
 boardsRouter.get("/", getAllBoards);
 boardsRouter.get("/:id", getBoard);

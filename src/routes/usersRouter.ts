@@ -4,8 +4,9 @@ import {
   loginUser,
   logoutUser,
 } from "../controllers/authController";
-import { getMe, getUser } from "../controllers/usersController";
+import { getUser } from "../controllers/usersController";
 import protect from "../middlewares/protect";
+import getMe from "../middlewares/getMe";
 
 const usersRouter = Express.Router();
 

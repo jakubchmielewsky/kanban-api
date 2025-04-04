@@ -64,8 +64,6 @@ const globalErrorController = (
   errorCopy.status = err.status || "error";
   errorCopy.message = err.message || "Something went wrong!";
 
-  console.log(err);
-
   if (err.code === 11000) errorCopy = handleDuplicateFieldsErrorDB(err);
   if (err.name === "ValidationError") errorCopy = handleValidationErrorDB(err);
   if (err.name === "CastError") errorCopy = handleCastErrorDB(err);
