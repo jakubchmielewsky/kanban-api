@@ -6,6 +6,7 @@ import UserInterface from "../interfaces/UserInterface";
 import Board from "../models/BoardModel";
 import Column from "../models/ColumnModel";
 import Task from "../models/TaskModel";
+import Subtask from "../models/SubtaskModel";
 
 export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -36,6 +37,7 @@ export const createOne = (Model: Model<any>) =>
     if (Model === Board) data = { ...req.body, owner: res.locals.user.id };
     if (Model === Column) data = { ...req.body, board: req.params.id };
     if (Model === Task) data = { ...req.body, column: req.params.id };
+    if (Model === Subtask) data = { ...req.body, task: req.params.id };
 
     const doc = await Model.create(data);
 
@@ -88,6 +90,7 @@ export const getAll = (Model: Model<any>) =>
     if (Model === Board) searchObject = { owner: res.locals.user._id };
     if (Model === Column) searchObject = { board: req.params.id };
     if (Model === Task) searchObject = { column: req.params.id };
+    if (Model === Subtask) searchObject = { task: req.params.id };
 
     const docs = await Model.find(searchObject);
 
