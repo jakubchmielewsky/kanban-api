@@ -9,6 +9,7 @@ import usersRouter from "./routes/usersRouter";
 import globalErrorController from "./controllers/globalErrorController";
 import boardsRouter from "./routes/boardsRouter";
 import columnsRouter from "./routes/columnsRouter";
+import tasksRouter from "./routes/tasksRouter";
 
 const app = Express();
 
@@ -39,6 +40,7 @@ app.use("/", (req, res, next) => {
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/boards", boardsRouter);
 app.use("/api/v1/columns", columnsRouter);
+app.use("/api/v1/tasks", tasksRouter);
 
 app.use(globalErrorController);
 

@@ -1,13 +1,4 @@
-import {
-  createOne,
-  getAll,
-  deleteOne,
-  updateOne,
-  getOne,
-} from "./handlerFactory";
-import Board from "../models/BoardModel";
-import catchAsync from "../utils/catchAsync";
-import { NextFunction, Request, Response } from "express";
+import { createOne, getAll, deleteOne, updateOne } from "./handlerFactory";
 import Column from "../models/ColumnModel";
 
 export const getAllColumns = getAll(Column);
