@@ -13,14 +13,11 @@ export const setParentReferenceIds =
 
     if (Model === Board) {
       parentReference.owner = res.locals.user.id;
-    }
-    if (Model === Column) {
+    } else if (Model === Column) {
       parentReference.board = req.params.id;
-    }
-    if (Model === Task) {
+    } else if (Model === Task) {
       parentReference.column = req.params.id;
-    }
-    if (Model === Subtask) {
+    } else if (Model === Subtask) {
       parentReference.task = req.params.id;
     }
 

@@ -1,12 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { Model, PopulateOptions } from "mongoose";
+import mongoose, { Model, PopulateOptions } from "mongoose";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/AppError";
 import UserInterface from "../interfaces/UserInterface";
-import Board from "../models/BoardModel";
-import Column from "../models/ColumnModel";
-import Task from "../models/TaskModel";
-import Subtask from "../models/SubtaskModel";
+import { cascadeDelete } from "../utils/cascadeDelete";
 
 export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -64,19 +61,37 @@ export const updateOne = (Model: Model<any>) =>
 
 export const deleteOne = (Model: Model<any>) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const doc = await Model.findByIdAndDelete(req.params.id);
+    const session = await mongoose.startSession();
 
-    if (!doc) {
-      return next(new AppError("No document found with that ID", 404));
+    try {
+      session.startTransaction();
+
+      const doc = await Model.findById(req.params.id).session(session);
+
+      if (!doc) {
+        await session.abortTransaction();
+        return next(new AppError("No document found with that ID", 404));
+      }
+
+      await cascadeDelete(session, Model, req.params.id);
+
+      await Model.findByIdAndDelete(req.params.id).session(session);
+
+      await session.commitTransaction();
+
+      res.status(204).json({
+        status: "success",
+        data: null,
+      });
+    } catch (error) {
+      await session.abortTransaction();
+
+      return next(error);
+    } finally {
+      await session.endSession();
     }
-
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
   });
 
-//returns all documents of a model if no id is provided in the request params - possibly a security issue !!!
 export const getAll = (Model: Model<any>) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const searchObject = res.locals.parentReference;
