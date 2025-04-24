@@ -2,7 +2,6 @@ import mongoose, { Model } from "mongoose";
 import Board from "../models/BoardModel";
 import Column from "../models/ColumnModel";
 import Task from "../models/TaskModel";
-import Subtask from "../models/SubtaskModel";
 
 export const cascadeDelete = async (
   session: mongoose.ClientSession,
@@ -18,7 +17,6 @@ export const cascadeDelete = async (
     );
     const taskIds = tasks.map((task) => task._id);
 
-    await Subtask.deleteMany({ task: { $in: taskIds } }).session(session);
     await Task.deleteMany({ column: { $in: columnIds } }).session(session);
     await Column.deleteMany({ board: documentId }).session(session);
   }
@@ -27,11 +25,6 @@ export const cascadeDelete = async (
     const tasks = await Task.find({ column: documentId }).session(session);
     const taskIds = tasks.map((task) => task._id);
 
-    await Subtask.deleteMany({ task: { $in: taskIds } }).session(session);
     await Task.deleteMany({ column: documentId }).session(session);
-  }
-
-  if (model === Task) {
-    await Subtask.deleteMany({ task: documentId }).session(session);
   }
 };

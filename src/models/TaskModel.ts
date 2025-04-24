@@ -1,5 +1,16 @@
 import mongoose, { Schema } from "mongoose";
 
+const subtaskSchema = new Schema({
+  title: {
+    type: String,
+    required: [true, "Subtask title is required"],
+  },
+  isCompleted: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const taskSchema = new Schema({
   title: {
     type: String,
@@ -19,10 +30,7 @@ const taskSchema = new Schema({
     ref: "column",
     required: [true, "Task must belong to a column"],
   },
-  subtasks: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "subtask",
-  },
+  subtasks: [subtaskSchema],
 });
 
 const Task = mongoose.model("task", taskSchema);

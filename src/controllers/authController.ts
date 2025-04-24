@@ -21,7 +21,8 @@ const createAndSendToken = (
           1000
     ),
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    //secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "none" as "none",
   };
 
@@ -31,7 +32,7 @@ const createAndSendToken = (
     status: "success",
     data: {
       user: {
-        id: user._id,
+        _id: user._id,
         email: user.email,
       },
     },

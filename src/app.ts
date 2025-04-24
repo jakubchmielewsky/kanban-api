@@ -10,7 +10,6 @@ import globalErrorController from "./controllers/globalErrorController";
 import boardsRouter from "./routes/boardsRouter";
 import columnsRouter from "./routes/columnsRouter";
 import tasksRouter from "./routes/tasksRouter";
-import subtasksRouter from "./routes/subtasksRouter";
 import AppError from "./utils/AppError";
 
 const app = Express();
@@ -20,11 +19,16 @@ if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 1000,
   message: "Too many requests from this IP, please try again later.",
 });
 app.use(limiter);
@@ -34,7 +38,8 @@ app.use(cookieParser());
 
 //testing middleware
 app.use("/", (req, res, next) => {
-  //console.log("Data received:", req.cookies);
+  console.log("Data received:", req.body);
+  //console.log("Cookies received:", req.cookies);
 
   next();
 });
@@ -43,7 +48,6 @@ app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/boards", boardsRouter);
 app.use("/api/v1/columns", columnsRouter);
 app.use("/api/v1/tasks", tasksRouter);
-app.use("/api/v1/subtasks", subtasksRouter);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));
