@@ -10,11 +10,14 @@ import {
 import columnsRouter from "./columnsRouter";
 import setParentReferenceIds from "../middlewares/setParentReferenceIds";
 import Board from "../models/BoardModel";
+import tasksRouter from "./tasksRouter";
 
 const boardsRouter = Express.Router();
 
 //redirects /api/boards/:id/columns to columns router and allows to grab board id param
 boardsRouter.use("/:id/columns", columnsRouter);
+
+boardsRouter.use("/:id/tasks", tasksRouter);
 
 boardsRouter.use(protect);
 

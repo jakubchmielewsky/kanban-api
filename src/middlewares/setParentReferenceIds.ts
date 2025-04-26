@@ -11,11 +11,9 @@ export const setParentReferenceIds =
     const parentReference: Record<string, string> = {};
 
     if (Model === Board) {
-      parentReference.owner = res.locals.user.id;
-    } else if (Model === Column) {
-      parentReference.board = req.params.id;
-    } else if (Model === Task) {
-      parentReference.column = req.params.id;
+      parentReference.ownerId = res.locals.user.id;
+    } else if (Model === Column || Model === Task) {
+      parentReference.boardId = req.params.id;
     }
 
     res.locals.parentReference = parentReference;
