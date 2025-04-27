@@ -11,6 +11,7 @@ import columnsRouter from "./columnsRouter";
 import setParentReferenceIds from "../middlewares/setParentReferenceIds";
 import Board from "../models/BoardModel";
 import tasksRouter from "./tasksRouter";
+import usersRouter from "./usersRouter";
 
 const boardsRouter = Express.Router();
 
@@ -18,6 +19,8 @@ const boardsRouter = Express.Router();
 boardsRouter.use("/:id/columns", columnsRouter);
 
 boardsRouter.use("/:id/tasks", tasksRouter);
+
+boardsRouter.use("/:id/members", usersRouter);
 
 boardsRouter.use(protect);
 

@@ -20,9 +20,7 @@ export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
 
     res.status(200).json({
       status: "success",
-      data: {
-        data: doc,
-      },
+      data: doc,
     });
   });
 
@@ -34,9 +32,7 @@ export const createOne = (Model: Model<any>) =>
 
     res.status(201).json({
       status: "success",
-      data: {
-        doc,
-      },
+      data: doc,
     });
   });
 
@@ -101,8 +97,6 @@ export const getAll = (Model: Model<any>) =>
     res.status(200).json({
       status: "success",
       results: docs.length,
-      data: {
-        data: docs,
-      },
+      data: docs,
     });
   });

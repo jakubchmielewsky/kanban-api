@@ -14,6 +14,7 @@ const boardSchema = new Schema(
     membersIds: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
+      select: false,
     },
   },
   {
