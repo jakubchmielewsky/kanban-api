@@ -8,6 +8,7 @@ import {
   addBoardMember,
   getBoardMembers,
   getUser,
+  removeBoardMember,
 } from "../controllers/usersController";
 import protect from "../middlewares/protect";
 import getMe from "../middlewares/getMe";
@@ -16,6 +17,7 @@ const usersRouter = Express.Router({ mergeParams: true });
 
 usersRouter.get("/", getBoardMembers);
 usersRouter.post("/", addBoardMember);
+usersRouter.delete("/", removeBoardMember);
 
 usersRouter.post("/register", registerUser);
 usersRouter.post("/login", loginUser);
