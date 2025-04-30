@@ -24,10 +24,20 @@ export const io = new Server(httpServer, {
 });
 
 io.on("connection", (socket) => {
-  console.log(` New client connected: ${socket.id}`);
+  console.log(`🔌 New client connected: ${socket.id}`);
+
+  socket.on("join_board", (boardId: string) => {
+    socket.join(boardId);
+    console.log(`📥 Client ${socket.id} joined board room: ${boardId}`);
+  });
+
+  socket.on("leave_board", (boardId: string) => {
+    socket.leave(boardId);
+    console.log(`📤 Client ${socket.id} left board room: ${boardId}`);
+  });
 
   socket.on("disconnect", () => {
-    console.log(` Client disconnected: ${socket.id}`);
+    console.log(`❌ Client disconnected: ${socket.id}`);
   });
 });
 

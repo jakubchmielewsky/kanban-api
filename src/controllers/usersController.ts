@@ -34,14 +34,14 @@ export const getBoardMembers = catchAsync(
 export const addBoardMember = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const boardId = req.params.id;
-    const { newMemberEmail } = req.body;
+    const { memberEmail } = req.body;
 
     const board = await Board.findById(boardId).select("membersIds");
     if (!board) {
       return next(new AppError("Board not found", 404));
     }
 
-    const user = await User.findOne({ email: newMemberEmail });
+    const user = await User.findOne({ email: memberEmail });
     if (!user) {
       return next(new AppError("User not found", 404));
     }
