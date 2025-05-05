@@ -14,6 +14,8 @@ import AppError from "./utils/AppError";
 
 const app = Express();
 
+app.set("trust proxy", 1);
+
 app.use(ExpressMongoSanitize());
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
