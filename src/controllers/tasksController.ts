@@ -8,20 +8,16 @@ import mongoose from "mongoose";
 import { cascadeDelete } from "../utils/cascadeDelete";
 
 export const getAllTasks = getAll(Task);
+
 export const getTask = getOne(Task);
+
 export const createTask = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const data = { ...req.body, ...res.locals.parentReference };
 
     const task = await Task.create(data);
 
-    const socketId = req.headers["x-socket-id"];
-
-    if (typeof socketId === "string") {
-      io.to(task.boardId.toString())
-        .except(socketId)
-        .emit("task_created", task);
-    }
+    io.to(task.boardId.toString()).emit("task_created", task);
 
     res.status(201).json({
       status: "success",
