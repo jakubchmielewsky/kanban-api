@@ -36,13 +36,7 @@ export const updateTask = catchAsync(
       return next(new AppError("No document found with that ID", 404));
     }
 
-    const socketId = req.headers["x-socket-id"];
-
-    if (typeof socketId === "string") {
-      io.to(task.boardId.toString())
-        .except(socketId)
-        .emit("task_updated", task);
-    }
+    io.to(task.boardId.toString()).emit("task_updated", task);
 
     res.status(200).json({
       status: "success",
