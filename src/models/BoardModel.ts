@@ -6,16 +6,6 @@ const boardSchema = new Schema(
       type: String,
       required: [true, "Board name is required"],
     },
-    ownerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "Board must belong to a owner"],
-    },
-    membersIds: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "User",
-      select: false,
-    },
   },
   {
     timestamps: true,
@@ -23,7 +13,6 @@ const boardSchema = new Schema(
 );
 
 boardSchema.index({ ownerId: 1 });
-boardSchema.index({ membersIds: 1 });
 
 boardSchema.path("createdAt").select(false);
 

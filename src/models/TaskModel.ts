@@ -24,25 +24,40 @@ const taskSchema = new Schema<TaskDocument>(
       type: String,
     },
     columnId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Column",
       required: [true, "Task must belong to a column"],
     },
     boardId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Board",
       required: [true, "Task must belong to a board"],
     },
     subtasks: [subtaskSchema],
     order: Number,
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Task must belong to a column"],
+    },
+    priority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+    },
+    labels: {
+      type: [Schema.Types.ObjectId],
+      ref: "Label",
+    },
   },
   {
     timestamps: true,
   }
 );
 
+//TODO: in the future add assigned members and deadline date
+
 taskSchema.index({ boardId: 1 });
-taskSchema.index({ columnId: 1 });
+taskSchema.index({ columnId: 1, order: 1 });
 
 taskSchema.path("createdAt").select(false);
 

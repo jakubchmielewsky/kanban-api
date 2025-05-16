@@ -20,6 +20,7 @@ const columnSchema = new Schema<ColumnDocument>(
 );
 
 columnSchema.index({ boardId: 1 });
+columnSchema.index({ boardId: 1, oder: 1 }, { unique: true });
 columnSchema.index({ boardId: 1, name: 1 }, { unique: true });
 
 columnSchema.path("createdAt").select(false);

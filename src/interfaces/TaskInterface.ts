@@ -6,6 +6,9 @@ export interface TaskInterface {
   description: string;
   columnId: mongoose.Types.ObjectId;
   boardId: mongoose.Types.ObjectId;
+  createdBy: mongoose.Types.ObjectId;
   subtasks: SubtaskInterface[];
   order?: number;
+  priority: string;
+  labels: [mongoose.Types.ObjectId];
 }
