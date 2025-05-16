@@ -4,6 +4,7 @@ import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/AppError";
 import UserInterface from "../interfaces/UserInterface";
 import { cascadeDelete } from "../utils/cascadeDelete";
+import { io } from "../server";
 
 export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -24,11 +25,23 @@ export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
     });
   });
 
-export const createOne = (Model: Model<any>) =>
+export const createOne = (
+  Model: Model<any>,
+  eventName?: string,
+  sendEventData?: boolean
+) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const data = { ...req.body, ...res.locals.parentReference };
 
     const doc = await Model.create(data);
+
+    if (eventName && doc.boardId) {
+      if (sendEventData) {
+        io.to(doc.boardId.toString()).emit(eventName, doc);
+      } else {
+        io.to(doc.boardId.toString()).emit(eventName);
+      }
+    }
 
     res.status(201).json({
       status: "success",
@@ -36,7 +49,11 @@ export const createOne = (Model: Model<any>) =>
     });
   });
 
-export const updateOne = (Model: Model<any>) =>
+export const updateOne = (
+  Model: Model<any>,
+  eventName?: string,
+  sendEventData?: boolean
+) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -47,6 +64,14 @@ export const updateOne = (Model: Model<any>) =>
       return next(new AppError("No document found with that ID", 404));
     }
 
+    if (eventName && doc.boardId) {
+      if (sendEventData) {
+        io.to(doc.boardId.toString()).emit(eventName, doc);
+      } else {
+        io.to(doc.boardId.toString()).emit(eventName);
+      }
+    }
+
     res.status(200).json({
       status: "success",
       data: {
@@ -55,7 +80,11 @@ export const updateOne = (Model: Model<any>) =>
     });
   });
 
-export const deleteOne = (Model: Model<any>) =>
+export const deleteOne = (
+  Model: Model<any>,
+  eventName?: string,
+  sendEventData?: boolean
+) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const session = await mongoose.startSession();
 
@@ -74,6 +103,20 @@ export const deleteOne = (Model: Model<any>) =>
       await Model.findByIdAndDelete(req.params.id).session(session);
 
       await session.commitTransaction();
+
+      if (eventName && doc.boardId) {
+        const socketId = req.headers["x-socket-id"];
+
+        if (typeof socketId === "string") {
+          if (sendEventData) {
+            io.to(doc.boardId.toString())
+              .except(socketId)
+              .emit(eventName, doc._id);
+          } else {
+            io.to(doc.boardId.toString()).except(socketId).emit(eventName);
+          }
+        }
+      }
 
       res.status(204).json({
         status: "success",

@@ -1,10 +1,4 @@
-import {
-  createOne,
-  getAll,
-  deleteOne,
-  updateOne,
-  getOne,
-} from "./handlerFactory";
+import { createOne, deleteOne, updateOne, getOne } from "./handlerFactory";
 import Board from "../models/BoardModel";
 import catchAsync from "../utils/catchAsync";
 import { NextFunction, Request, Response } from "express";

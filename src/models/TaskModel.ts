@@ -22,7 +22,6 @@ const taskSchema = new Schema<TaskDocument>(
     },
     description: {
       type: String,
-      required: [true, "Task description is required"],
     },
     columnId: {
       type: mongoose.Schema.Types.ObjectId,
