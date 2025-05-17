@@ -11,6 +11,9 @@ import boardsRouter from "./routes/boardsRouter";
 import columnsRouter from "./routes/columnsRouter";
 import tasksRouter from "./routes/tasksRouter";
 import AppError from "./utils/AppError";
+import teamsRouter from "./routes/teamsRouter";
+import commentsRouter from "./routes/commentsRouter";
+import labelsRouter from "./routes/labelsRouter";
 
 const app = Express();
 
@@ -47,9 +50,12 @@ app.use("/", (req, res, next) => {
 });
 
 app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/teams", teamsRouter);
 app.use("/api/v1/boards", boardsRouter);
 app.use("/api/v1/columns", columnsRouter);
 app.use("/api/v1/tasks", tasksRouter);
+app.use("/api/v1/comments", commentsRouter);
+app.use("/api/v1/labels", labelsRouter);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));

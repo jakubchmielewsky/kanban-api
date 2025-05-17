@@ -3,21 +3,23 @@ import protect from "../middlewares/protect";
 import {
   createColumn,
   deleteColumn,
-  getAllColumns,
+  getBoardColumns,
+  getColumnDetails,
   updateColumn,
 } from "../controllers/columnsController";
 import setParentReferenceIds from "../middlewares/setParentReferenceIds";
 import Column from "../models/ColumnModel";
 
-const columnsRouter = Express.Router({ mergeParams: true }); //merge params gives access to params of previous router
+const columnsRouter = Express.Router({ mergeParams: true });
 
 columnsRouter.use(protect);
 
 columnsRouter.use(setParentReferenceIds(Column));
 
-columnsRouter.get("/", getAllColumns);
+columnsRouter.get("/", getBoardColumns);
 columnsRouter.post("/", createColumn);
-columnsRouter.patch("/:id", updateColumn);
-columnsRouter.delete("/:id", deleteColumn);
+columnsRouter.get("/:columnId", getColumnDetails);
+columnsRouter.patch("/:columnId", updateColumn);
+columnsRouter.delete("/:columnId", deleteColumn);
 
 export default columnsRouter;

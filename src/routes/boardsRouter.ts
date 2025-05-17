@@ -11,27 +11,24 @@ import columnsRouter from "./columnsRouter";
 import setParentReferenceIds from "../middlewares/setParentReferenceIds";
 import Board from "../models/BoardModel";
 import tasksRouter from "./tasksRouter";
-import usersRouter from "./usersRouter";
 import restrictAccessToMembersOrOwner from "../middlewares/restrictAccessToMembersOrOwner";
 
-const boardsRouter = Express.Router();
+const boardsRouter = Express.Router({ mergeParams: true });
 
 boardsRouter.use(protect);
-columnsRouter.use(restrictAccessToMembersOrOwner);
+//columnsRouter.use(restrictAccessToMembersOrOwner);
 
 //redirects /api/boards/:id/columns to columns router and allows to grab board id param
-boardsRouter.use("/:id/columns", columnsRouter);
+boardsRouter.use("/:boardId/columns", columnsRouter);
 
-boardsRouter.use("/:id/tasks", tasksRouter);
-
-boardsRouter.use("/:id/members", usersRouter);
+boardsRouter.use("/:boardId/tasks", tasksRouter);
 
 boardsRouter.use(setParentReferenceIds(Board));
 
-boardsRouter.get("/", getAllBoards);
-boardsRouter.get("/:id", getBoard);
+boardsRouter.get("/", getTeamBoards);
 boardsRouter.post("/", createBoard);
-boardsRouter.patch("/:id", updateBoard);
-boardsRouter.delete("/:id", deleteBoard);
+boardsRouter.get("/:boardId", getBoardDetails);
+boardsRouter.patch("/:boardId", updateBoard);
+boardsRouter.delete("/:boardId", deleteBoard);
 
 export default boardsRouter;

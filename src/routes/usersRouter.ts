@@ -4,20 +4,11 @@ import {
   loginUser,
   logoutUser,
 } from "../controllers/authController";
-import {
-  addBoardMember,
-  getBoardMembers,
-  getUser,
-  removeBoardMember,
-} from "../controllers/usersController";
+import { getUser } from "../controllers/usersController";
 import protect from "../middlewares/protect";
 import getMe from "../middlewares/getMe";
 
-const usersRouter = Express.Router({ mergeParams: true });
-
-usersRouter.get("/", getBoardMembers);
-usersRouter.post("/", addBoardMember);
-usersRouter.delete("/", removeBoardMember);
+const usersRouter = Express.Router();
 
 usersRouter.post("/register", registerUser);
 usersRouter.post("/login", loginUser);
