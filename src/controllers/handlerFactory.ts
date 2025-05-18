@@ -6,6 +6,14 @@ import UserInterface from "../interfaces/UserInterface";
 import { cascadeDelete } from "../utils/cascadeDelete";
 import { io } from "../server";
 
+interface HandlerOptions {
+  parentParam?: string;
+  populate?: PopulateOptions | PopulateOptions[];
+  pipeline?: any[];
+  eventName?: string;
+  sendEventData?: boolean;
+}
+
 export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     let doc: UserInterface | null;
@@ -131,7 +139,7 @@ export const deleteOne = (
     }
   });
 
-export const getAll = (Model: Model<any>) =>
+export const getAll = (Model: Model<any>, options: HandlerOptions = {}) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const searchObject = res.locals.parentReference;
 
