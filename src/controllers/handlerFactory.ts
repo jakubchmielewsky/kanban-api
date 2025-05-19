@@ -165,6 +165,7 @@ export const deleteOne = (Model: Model<any>, options: HandlerOptions = {}) =>
   });
 
 export const getAll = (Model: Model<any>, options: HandlerOptions = {}) =>
+export const getAll = (Model: Model<any>, options: HandlerOptions = {}) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     let filter = {};
     if (options.parentParam) {

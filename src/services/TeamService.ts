@@ -44,7 +44,7 @@ class TeamService {
     const team = await TeamRepository.create(data);
     await TeamMemberRepository.create({
       teamId: team._id,
-      userId: ownerId,
+      userId: new mongoose.Types.ObjectId(ownerId),
       role: "owner",
     });
 

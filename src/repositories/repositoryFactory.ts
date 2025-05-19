@@ -7,9 +7,8 @@ export class RepositoryFactory<T> {
     this.model = model;
   }
 
-  findAll(filter: any, aggregateOptions?: any) {
-    if (aggregateOptions) return this.model.aggregate(aggregateOptions);
-    else return this.model.find(filter);
+  findAll(filter: any) {
+    return this.model.find(filter);
   }
 
   findById(id: string, populateOptions?: PopulateOptions) {
@@ -18,7 +17,7 @@ export class RepositoryFactory<T> {
     return query;
   }
 
-  create(data: any) {
+  create(data: Partial<T>) {
     return this.model.create(data);
   }
 
