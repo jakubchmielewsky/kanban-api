@@ -7,14 +7,9 @@ import {
   getColumnDetails,
   updateColumn,
 } from "../controllers/columnsController";
-import setParentReferenceIds from "../middlewares/setParentReferenceIds";
 import Column from "../models/ColumnModel";
 
 const columnsRouter = Express.Router({ mergeParams: true });
-
-columnsRouter.use(protect);
-
-columnsRouter.use(setParentReferenceIds(Column));
 
 columnsRouter.get("/", getBoardColumns);
 columnsRouter.post("/", createColumn);

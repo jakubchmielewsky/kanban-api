@@ -5,6 +5,7 @@ import {
   getTeamLabels,
   updateLabel,
 } from "../controllers/labelsController";
+import protect from "../middlewares/protect";
 
 const labelsRouter = Express.Router({ mergeParams: true });
 

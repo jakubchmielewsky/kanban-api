@@ -10,7 +10,6 @@ const userSchema = new Schema<UserInterface>(
       required: [true, "Email is required"],
       trim: true,
       lowercase: true,
-      unique: true,
       validate: [validator.isEmail, "Please provide a valid email"],
     },
     name: String,

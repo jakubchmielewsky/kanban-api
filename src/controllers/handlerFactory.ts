@@ -6,13 +6,28 @@ import UserInterface from "../interfaces/UserInterface";
 import { cascadeDelete } from "../utils/cascadeDelete";
 import { io } from "../server";
 
-export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
+interface HandlerOptions {
+  idName?: string;
+  parentParam?: string;
+  populate?: PopulateOptions | PopulateOptions[];
+  pipeline?: any[];
+  eventName?: string;
+  sendEventData?: boolean;
+}
+
+export const getOne = (Model: Model<any>, options: HandlerOptions = {}) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    if (!options.idName) {
+      return next(new AppError("Incorrect ID", 400));
+    }
+
     let doc: UserInterface | null;
-    if (populateOptions) {
-      doc = await Model.findById(req.params.id).populate(populateOptions);
+    if (options.populate) {
+      doc = await Model.findById(req.params[options.idName]).populate(
+        options.populate
+      );
     } else {
-      doc = await Model.findById(req.params.id);
+      doc = await Model.findById(req.params[options.idName]);
     }
 
     if (!doc) {
@@ -25,21 +40,27 @@ export const getOne = (Model: Model<any>, populateOptions?: PopulateOptions) =>
     });
   });
 
-export const createOne = (
-  Model: Model<any>,
-  eventName?: string,
-  sendEventData?: boolean
-) =>
+export const createOne = (Model: Model<any>, options: HandlerOptions = {}) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const data = { ...req.body, ...res.locals.parentReference };
+    const data: any = { ...req.body };
+    if (options.parentParam) {
+      if (options.parentParam === "ownerId") {
+        data[options.parentParam] = res.locals.user.id;
+      } else data[options.parentParam] = req.params[options.parentParam];
+    }
+
+    console.log(data);
 
     const doc = await Model.create(data);
 
-    if (eventName && doc.boardId) {
-      if (sendEventData) {
-        io.to(doc.boardId.toString()).emit(eventName, doc);
+    console.log(doc);
+
+    if (options.eventName) {
+      const roomId = (doc as any)[options.parentParam!].toString();
+      if (options.sendEventData) {
+        io.to(roomId).emit(options.eventName, doc);
       } else {
-        io.to(doc.boardId.toString()).emit(eventName);
+        io.to(roomId).emit(options.eventName);
       }
     }
 
@@ -49,26 +70,31 @@ export const createOne = (
     });
   });
 
-export const updateOne = (
-  Model: Model<any>,
-  eventName?: string,
-  sendEventData?: boolean
-) =>
+export const updateOne = (Model: Model<any>, options: HandlerOptions = {}) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    if (!options.idName) {
+      return next(new AppError("Incorrect ID", 400));
+    }
+
+    const doc = await Model.findByIdAndUpdate(
+      req.params[options.idName],
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!doc) {
       return next(new AppError("No document found with that ID", 404));
     }
 
-    if (eventName && doc.boardId) {
-      if (sendEventData) {
-        io.to(doc.boardId.toString()).emit(eventName, doc);
+    if (options.eventName) {
+      const roomId = (doc as any)[options.parentParam!].toString();
+      if (options.sendEventData) {
+        io.to(roomId).emit(options.eventName, doc);
       } else {
-        io.to(doc.boardId.toString()).emit(eventName);
+        io.to(roomId).emit(options.eventName);
       }
     }
 
@@ -80,40 +106,47 @@ export const updateOne = (
     });
   });
 
-export const deleteOne = (
-  Model: Model<any>,
-  eventName?: string,
-  sendEventData?: boolean
-) =>
+export const deleteOne = (Model: Model<any>, options: HandlerOptions = {}) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    if (!options.idName) {
+      return next(new AppError("Incorrect ID", 400));
+    }
+
     const session = await mongoose.startSession();
 
     try {
       session.startTransaction();
 
-      const doc = await Model.findById(req.params.id).session(session);
+      console.log(req.params[options.idName]);
+      const doc = await Model.findById(req.params[options.idName]).session(
+        session
+      );
 
       if (!doc) {
         await session.abortTransaction();
         return next(new AppError("No document found with that ID", 404));
       }
 
-      await cascadeDelete(session, Model, req.params.id);
+      //await cascadeDelete(session, Model, req.params.id);
 
-      await Model.findByIdAndDelete(req.params.id).session(session);
+      await Model.findByIdAndDelete(req.params[options.idName]).session(
+        session
+      );
 
       await session.commitTransaction();
 
-      if (eventName && doc.boardId) {
+      if (options.eventName) {
         const socketId = req.headers["x-socket-id"];
 
         if (typeof socketId === "string") {
-          if (sendEventData) {
+          if (options.sendEventData) {
             io.to(doc.boardId.toString())
               .except(socketId)
-              .emit(eventName, doc._id);
+              .emit(options.eventName, doc._id);
           } else {
-            io.to(doc.boardId.toString()).except(socketId).emit(eventName);
+            io.to(doc.boardId.toString())
+              .except(socketId)
+              .emit(options.eventName);
           }
         }
       }
@@ -131,11 +164,30 @@ export const deleteOne = (
     }
   });
 
-export const getAll = (Model: Model<any>) =>
+export const getAll = (Model: Model<any>, options: HandlerOptions = {}) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const searchObject = res.locals.parentReference;
+    let filter = {};
+    if (options.parentParam) {
+      if (options.parentParam === "ownerId") {
+        filter = { [options.parentParam]: res.locals.user.id };
+      } else
+        filter = { [options.parentParam]: req.params[options.parentParam] };
+    }
 
-    const docs = await Model.find(searchObject);
+    let docs;
+    if (options.pipeline) {
+      const agg = [...options.pipeline];
+      if (options.parentParam) {
+        agg.unshift({ $match: filter });
+      }
+      docs = await Model.aggregate(agg);
+    } else {
+      let query = Model.find(filter);
+      if (options.populate) {
+        query = query.populate(options.populate);
+      }
+      docs = await query;
+    }
 
     res.status(200).json({
       status: "success",

@@ -9,13 +9,13 @@ export function connectDB() {
     .then(async () => {
       console.log("🚀 MongoDB connected successfully!");
 
-      // await Promise.all([
-      //   Board.syncIndexes(),
-      //   Column.syncIndexes(),
-      //   Task.syncIndexes(),
-      // ]);
+      await Promise.all([
+        Board.syncIndexes(),
+        Column.syncIndexes(),
+        Task.syncIndexes(),
+      ]);
 
-      // console.log("Indexes synchronized");
+      console.log("Indexes synchronized");
     })
     .catch((error: any) => {
       console.error("💥 MongoDB connection failed:", error.message);

@@ -7,17 +7,13 @@ import {
   getTaskDetails,
   updateTask,
 } from "../controllers/tasksController";
-import setParentReferenceIds from "../middlewares/setParentReferenceIds";
-import Task from "../models/TaskModel";
 import commentsRouter from "./commentsRouter";
 
 const tasksRouter = Express.Router({ mergeParams: true });
 
-tasksRouter.use(":taskId/comments", commentsRouter);
+tasksRouter.use("/:taskId/comments", commentsRouter);
 
 tasksRouter.use(protect);
-
-tasksRouter.use(setParentReferenceIds(Task));
 
 tasksRouter.get("/", getBoardTasks);
 tasksRouter.post("/", createTask);

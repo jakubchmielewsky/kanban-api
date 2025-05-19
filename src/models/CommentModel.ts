@@ -12,7 +12,10 @@ const commentSchema = new Schema(
       ref: "User",
       required: [true, "comment must belong to a user"],
     },
-    content: String,
+    content: {
+      type: String,
+      required: [true, "comment must have a content"],
+    },
   },
   { timestamps: true }
 );

@@ -1,14 +1,37 @@
-import {
-  createOne,
-  getAll,
-  deleteOne,
-  updateOne,
-  getOne,
-} from "./handlerFactory";
-import Column from "../models/ColumnModel";
+import ColumnService from "../services/ColumnService";
+import catchAsync from "../utils/catchAsync";
+import { Request, Response } from "express";
 
-export const getBoardColumns = getAll(Column);
-export const createColumn = createOne(Column, "columns_updated", true);
-export const getColumnDetails = getOne(Column);
-export const updateColumn = updateOne(Column, "columns_updated", true);
-export const deleteColumn = deleteOne(Column, "columns_updated", true);
+export const getBoardColumns = catchAsync(
+  async (req: Request, res: Response) => {
+    const boardId = req.params.boardId;
+    const columns = await ColumnService.findAll({ boardId });
+    res.status(200).json({ status: "success", data: columns });
+  }
+);
+
+export const createColumn = catchAsync(async (req: Request, res: Response) => {
+  const boardId = req.params.boardId;
+  const column = await ColumnService.create({ ...req.body, boardId });
+  res.status(201).json({ status: "success", data: column });
+});
+
+export const getColumnDetails = catchAsync(
+  async (req: Request, res: Response) => {
+    const columnId = req.params.columnId;
+    const column = await ColumnService.findById(columnId);
+    res.status(200).json({ status: "success", data: column });
+  }
+);
+
+export const updateColumn = catchAsync(async (req: Request, res: Response) => {
+  const columnId = req.params.columnId;
+  const column = await ColumnService.update(columnId, req.body);
+  res.status(200).json({ status: "success", data: column });
+});
+
+export const deleteColumn = catchAsync(async (req: Request, res: Response) => {
+  const columnId = req.params.columnId;
+  await ColumnService.remove(columnId);
+  res.status(204).send();
+});

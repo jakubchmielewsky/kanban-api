@@ -14,14 +14,17 @@ const teamMemberSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "member", "guest"],
+      enum: ["owner", "admin", "member", "guest"],
       required: [true, "role must be specified"],
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
+teamMemberSchema.index({ userId: 1 });
 teamMemberSchema.index({ teamId: 1, userId: 1 }, { unique: true });
 
-const TeamMember = mongoose.model("team", teamMemberSchema);
+const TeamMember = mongoose.model("TeamMember", teamMemberSchema);
 export default TeamMember;

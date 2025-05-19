@@ -38,7 +38,7 @@ const taskSchema = new Schema<TaskDocument>(
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "Task must belong to a column"],
+      required: [true, "Task must have author"],
     },
     priority: {
       type: String,

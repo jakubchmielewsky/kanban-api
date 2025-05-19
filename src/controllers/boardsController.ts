@@ -1,25 +1,31 @@
-import { createOne, deleteOne, updateOne, getOne } from "./handlerFactory";
-import Board from "../models/BoardModel";
+import BoardService from "../services/BoardService";
 import catchAsync from "../utils/catchAsync";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
-export const getAllBoards = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const userId = res.locals.user.id;
-
-    const docs = await Board.find({
-      $or: [{ ownerId: userId }, { membersIds: { $in: [userId] } }],
-    });
-
-    res.status(200).json({
-      status: "success",
-      results: docs.length,
-      data: docs,
-    });
+export const getTeamBoards = catchAsync(async (req: Request, res: Response) => {
+  const teamId = req.params.teamId;
+  const boards = await BoardService.findAll({ teamId });
+  res.status(200).json({ status: "success", data: boards });
+});
+export const createBoard = catchAsync(async (req: Request, res: Response) => {
+  const teamId = req.params.teamId;
+  const board = await BoardService.create({ ...req.body, teamId });
+  res.status(201).json({ status: "success", data: board });
+});
+export const getBoardDetails = catchAsync(
+  async (req: Request, res: Response) => {
+    const boardId = req.params.boardId;
+    const board = await BoardService.findById(boardId);
+    res.status(200).json({ status: "success", data: board });
   }
 );
-
-export const getBoard = getOne(Board);
-export const createBoard = createOne(Board);
-export const updateBoard = updateOne(Board);
-export const deleteBoard = deleteOne(Board);
+export const updateBoard = catchAsync(async (req: Request, res: Response) => {
+  const boardId = req.params.boardId;
+  const board = await BoardService.update(boardId, req.body);
+  res.status(200).json({ status: "success", data: board });
+});
+export const deleteBoard = catchAsync(async (req: Request, res: Response) => {
+  const boardId = req.params.boardId;
+  await BoardService.remove(boardId);
+  res.status(204).send();
+});

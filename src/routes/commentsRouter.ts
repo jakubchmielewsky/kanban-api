@@ -5,6 +5,7 @@ import {
   getTaskComments,
   updateComment,
 } from "../controllers/commentsController";
+import protect from "../middlewares/protect";
 
 const commentsRouter = Express.Router({ mergeParams: true });
 

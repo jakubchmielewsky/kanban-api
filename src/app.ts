@@ -14,6 +14,7 @@ import AppError from "./utils/AppError";
 import teamsRouter from "./routes/teamsRouter";
 import commentsRouter from "./routes/commentsRouter";
 import labelsRouter from "./routes/labelsRouter";
+import teamMembersRouter from "./routes/teamMembersRouter";
 
 const app = Express();
 
@@ -43,7 +44,7 @@ app.use(cookieParser());
 
 //testing middleware
 app.use("/", (req, res, next) => {
-  //console.log("Data received:", req.body);
+  console.log("Data received:", req.body);
   //console.log("Cookies received:", req.cookies);
 
   next();
@@ -51,11 +52,11 @@ app.use("/", (req, res, next) => {
 
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/teams", teamsRouter);
-app.use("/api/v1/boards", boardsRouter);
-app.use("/api/v1/columns", columnsRouter);
-app.use("/api/v1/tasks", tasksRouter);
-app.use("/api/v1/comments", commentsRouter);
-app.use("/api/v1/labels", labelsRouter);
+//app.use("/api/v1/boards", boardsRouter);
+//app.use("/api/v1/columns", columnsRouter);
+//app.use("/api/v1/tasks", tasksRouter);
+//app.use("/api/v1/comments", commentsRouter);
+//app.use("/api/v1/labels", labelsRouter);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));

@@ -5,22 +5,20 @@ import labelsRouter from "./labelsRouter";
 import {
   createTeam,
   deleteTeam,
-  getTeamDetails,
   getUserTeams,
   updateTeam,
 } from "../controllers/teamsController";
+import protect from "../middlewares/protect";
 
 const teamsRouter = Express.Router();
 
-//protect,restrict
+teamsRouter.use(protect);
 
-teamsRouter.use("/:teamId/members", teamMembersRouter);
 teamsRouter.use("/:teamId/boards", boardsRouter);
 teamsRouter.use("/:teamId/labels", labelsRouter);
 
 teamsRouter.get("/", getUserTeams);
 teamsRouter.post("/", createTeam);
-teamsRouter.get("/:teamId", getTeamDetails);
 teamsRouter.patch("/:teamId", updateTeam);
 teamsRouter.delete("/:teamId", deleteTeam);
 
