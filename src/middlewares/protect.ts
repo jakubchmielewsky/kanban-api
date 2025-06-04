@@ -32,7 +32,7 @@ const protect = catchAsync(
       );
     }
 
-    res.locals.user = currentUser;
+    req.user = { id: String(currentUser._id) };
 
     next();
   }

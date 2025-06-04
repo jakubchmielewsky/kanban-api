@@ -1,24 +1,20 @@
-import { LabelRepository } from "../repositories/repositories";
+import Label from "../models/LabelModel";
 
 class LabelService {
-  findAll(filter: any) {
-    return LabelRepository.findAll(filter);
+  findAll(teamId: string) {
+    return Label.find({ teamId }).lean();
   }
 
-  findById(id: string) {
-    return LabelRepository.findById(id);
+  create(data: { teamId: string; name: string; color: string }) {
+    return Label.create(data);
   }
 
-  create(data: any) {
-    return LabelRepository.create(data);
+  update(labelId: string, updates: { name: string; color: string }) {
+    return Label.findByIdAndUpdate(labelId, updates);
   }
 
-  update(id: string, updates: any) {
-    return LabelRepository.update(id, updates);
-  }
-
-  remove(id: string) {
-    return LabelRepository.delete(id);
+  remove(labelId: string) {
+    return Label.findByIdAndDelete(labelId);
   }
 }
 

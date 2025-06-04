@@ -1,24 +1,24 @@
-import { ColumnRepository } from "../repositories/repositories";
+import Column from "../models/ColumnModel";
 
 class ColumnService {
-  findAll(filter: any) {
-    return ColumnRepository.findAll(filter);
+  async findAll(boardId: string) {
+    return await Column.find({ boardId }).lean();
   }
 
-  findById(id: string) {
-    return ColumnRepository.findById(id);
+  async create(data: { teamId: string; boardId: string; name: string }) {
+    return await Column.create(data);
   }
 
-  create(data: any) {
-    return ColumnRepository.create(data);
+  async update(columnId: string, updates: { name: string; order: number }) {
+    return await Column.findByIdAndUpdate(columnId, updates, {
+      new: true,
+      runValidators: true,
+      lean: true,
+    });
   }
 
-  update(id: string, updates: any) {
-    return ColumnRepository.update(id, updates);
-  }
-
-  remove(id: string) {
-    return ColumnRepository.delete(id);
+  async remove(columnId: string) {
+    return await Column.findByIdAndDelete(columnId).lean();
   }
 }
 

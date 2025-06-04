@@ -1,0 +1,26 @@
+import { NextFunction, Response, Request } from "express";
+import AppError from "../utils/AppError";
+import catchAsync from "../utils/catchAsync";
+import TeamMember from "../models/TeamMemberModel";
+import mongoose from "mongoose";
+
+const getRole = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const teamId = req.params.teamId;
+
+    const teamMember = await TeamMember.findOne({
+      userId: new mongoose.Types.ObjectId(userId),
+      teamId: new mongoose.Types.ObjectId(teamId),
+    });
+
+    if (!teamMember || !req.user)
+      return next(new AppError("You don't have access to that resource", 403));
+
+    req.user.role = teamMember.role;
+    req.user.teamId = teamMember.teamId.toString();
+    next();
+  }
+);
+
+export default getRole;

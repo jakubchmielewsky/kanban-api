@@ -1,20 +1,7 @@
-import mongoose, { Schema, Model } from "mongoose";
-import { SubtaskInterface } from "../interfaces/SubtaskInterface";
-import { TaskInterface } from "../interfaces/TaskInterface";
-import { TaskDocument } from "../interfaces/TaskDocument";
+import mongoose, { Schema } from "mongoose";
+import { TaskInterface } from "../interfaces/task/TaskInterface";
 
-const subtaskSchema = new Schema<SubtaskInterface>({
-  title: {
-    type: String,
-    required: [true, "Subtask title is required"],
-  },
-  isCompleted: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const taskSchema = new Schema<TaskDocument>(
+const taskSchema = new Schema<TaskInterface>(
   {
     title: {
       type: String,
@@ -33,16 +20,16 @@ const taskSchema = new Schema<TaskDocument>(
       ref: "Board",
       required: [true, "Task must belong to a board"],
     },
-    subtasks: [subtaskSchema],
+    teamId: {
+      type: Schema.Types.ObjectId,
+      ref: "Team",
+      required: [true, "Task must belong to a team"],
+    },
     order: Number,
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: [true, "Task must have author"],
-    },
-    priority: {
-      type: String,
-      enum: ["low", "medium", "high"],
     },
     labels: {
       type: [Schema.Types.ObjectId],
@@ -57,21 +44,23 @@ const taskSchema = new Schema<TaskDocument>(
 //TODO: in the future add assigned members and deadline date
 
 taskSchema.index({ boardId: 1 });
-taskSchema.index({ columnId: 1, order: 1 });
+taskSchema.index({ columnId: 1 });
 
 taskSchema.path("createdAt").select(false);
+//taskSchema.path("updatedAt").select(false);
 
-taskSchema.pre<TaskDocument>("save", async function (next) {
+taskSchema.pre<TaskInterface>("save", async function (next) {
   if (!this.isNew || (this.order !== undefined && this.order !== null)) {
     return next();
   }
 
   try {
     const maxOrderTask = await mongoose
-      .model<TaskDocument>("Task")
+      .model<TaskInterface>("Task")
       .findOne({ columnId: this.columnId })
       .sort("-order")
-      .select("order");
+      .select("order")
+      .lean();
 
     this.order = maxOrderTask ? maxOrderTask.order! + 1024 : 1024;
     next();
@@ -80,6 +69,6 @@ taskSchema.pre<TaskDocument>("save", async function (next) {
   }
 });
 
-const Task = mongoose.model<TaskDocument>("Task", taskSchema);
+const Task = mongoose.model("Task", taskSchema);
 
 export default Task;

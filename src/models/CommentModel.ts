@@ -7,6 +7,11 @@ const commentSchema = new Schema(
       ref: "Task",
       required: [true, "comment must belong to a task"],
     },
+    teamId: {
+      type: Schema.Types.ObjectId,
+      ref: "Team",
+      required: [true, "Comment must belong to a team"],
+    },
     authorId: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -21,6 +26,7 @@ const commentSchema = new Schema(
 );
 
 commentSchema.index({ taskId: 1 });
+commentSchema.index({ taskId: 1, authorId: 1 });
 
 const Comment = mongoose.model("Comment", commentSchema);
 

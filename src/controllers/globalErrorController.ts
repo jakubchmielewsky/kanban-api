@@ -71,6 +71,7 @@ const globalErrorController = (
   if (err.name === "TokenExpiredError") errorCopy = handleJWTExpiredError();
 
   if (process.env.NODE_ENV === "development") {
+    console.log(err);
     return sendErrorDevelopment(errorCopy, req, res);
   }
   sendErrorProduction(errorCopy, req, res);

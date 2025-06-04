@@ -5,13 +5,31 @@ import {
   getTaskComments,
   updateComment,
 } from "../controllers/commentsController";
-import protect from "../middlewares/protect";
+import checkIfResourceBelongsToUsersTeam from "../middlewares/checkIfResourceBelongsToTeam";
+import Comment from "../models/CommentModel";
+import Task from "../models/TaskModel";
 
 const commentsRouter = Express.Router({ mergeParams: true });
 
-commentsRouter.get("/", getTaskComments);
-commentsRouter.post("/", createComment);
-commentsRouter.patch("/:commentId", updateComment);
-commentsRouter.delete("/:commentId", deleteComment);
+commentsRouter.get(
+  "/",
+  checkIfResourceBelongsToUsersTeam(Task, "taskId"),
+  getTaskComments
+);
+commentsRouter.post(
+  "/",
+  checkIfResourceBelongsToUsersTeam(Task, "taskId"),
+  createComment
+);
+commentsRouter.patch(
+  "/:commentId",
+  checkIfResourceBelongsToUsersTeam(Comment, "commentId"),
+  updateComment
+);
+commentsRouter.delete(
+  "/:commentId",
+  checkIfResourceBelongsToUsersTeam(Comment, "commentId"),
+  deleteComment
+);
 
 export default commentsRouter;

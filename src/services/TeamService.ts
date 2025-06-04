@@ -1,18 +1,13 @@
 import mongoose from "mongoose";
-import {
-  TeamMemberRepository,
-  TeamRepository,
-} from "../repositories/repositories";
 import TeamMember from "../models/TeamMemberModel";
+import Team from "../models/TeamModel";
 
 class TeamService {
-  findAll(filter: any) {
-    const userId = new mongoose.Types.ObjectId(filter.userId);
-
-    return TeamMember.aggregate([
+  async findAll(userId: string) {
+    return await TeamMember.aggregate([
       {
         $match: {
-          userId,
+          userId: new mongoose.Types.ObjectId(userId),
         },
       },
       {
@@ -20,10 +15,10 @@ class TeamService {
           from: "teams",
           localField: "teamId",
           foreignField: "_id",
-          as: "team",
+          as: "teamData",
         },
       },
-      { $unwind: "$team" },
+      { $unwind: "$teamData" },
       {
         $project: {
           teamId: 0,
@@ -31,32 +26,38 @@ class TeamService {
           createdAt: 0,
           updatedAt: 0,
           __v: 0,
-          "team.createdAt": 0,
-          "team.updatedAt": 0,
-          "team.__v": 0,
+          "teamData.createdAt": 0,
+          "teamData.updatedAt": 0,
+          "teamData.__v": 0,
         },
       },
     ]);
   }
 
-  async create(data: any, ownerId: string) {
-    ///TODO:implement sessions here
-    const team = await TeamRepository.create(data);
-    await TeamMemberRepository.create({
+  async create(ownerId: string, name: string) {
+    ///TODO: implement sessions here
+
+    const team = await Team.create({ name });
+    await TeamMember.create({
       teamId: team._id,
-      userId: new mongoose.Types.ObjectId(ownerId),
+      userId: ownerId,
       role: "owner",
     });
 
     return team;
   }
 
-  update(id: string, updates: any) {
-    return TeamRepository.update(id, updates);
+  update(teamId: string, name: string) {
+    return Team.findByIdAndUpdate(
+      teamId,
+      { name },
+      { runValidators: true, new: true, lean: true }
+    );
   }
 
-  remove(id: string) {
-    return TeamRepository.delete(id);
+  //TODO: cascade delete
+  remove(teamId: string) {
+    return Team.findByIdAndDelete(teamId).lean();
   }
 }
 

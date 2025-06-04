@@ -17,7 +17,7 @@ const boardSchema = new Schema(
   }
 );
 
-boardSchema.index({ teamId: 1 });
+boardSchema.index({ _id: 1, teamId: 1 });
 boardSchema.index({ teamId: 1, name: 1 }, { unique: true });
 
 boardSchema.path("createdAt").select(false);

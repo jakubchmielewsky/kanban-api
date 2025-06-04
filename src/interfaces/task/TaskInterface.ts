@@ -1,13 +1,12 @@
 import mongoose, { Document } from "mongoose";
-import { SubtaskInterface } from "./SubtaskInterface";
 
-export interface TaskInterface {
+export interface TaskInterface extends Document {
   title: string;
   description: string;
   columnId: mongoose.Types.ObjectId;
   boardId: mongoose.Types.ObjectId;
+  teamId: mongoose.Types.ObjectId;
   createdBy: mongoose.Types.ObjectId;
-  subtasks: SubtaskInterface[];
   order?: number;
   priority: string;
   labels: [mongoose.Types.ObjectId];

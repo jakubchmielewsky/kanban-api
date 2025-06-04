@@ -7,6 +7,11 @@ const columnSchema = new Schema<ColumnDocument>(
       type: String,
       required: [true, "Column name is required"],
     },
+    teamId: {
+      type: Schema.Types.ObjectId,
+      ref: "Team",
+      required: [true, "Column must belong to a team"],
+    },
     boardId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Board",
@@ -24,6 +29,7 @@ columnSchema.index({ boardId: 1, order: 1 }, { unique: true });
 columnSchema.index({ boardId: 1, name: 1 }, { unique: true });
 
 columnSchema.path("createdAt").select(false);
+columnSchema.path("updatedAt").select(false);
 
 columnSchema.pre<ColumnDocument>("save", async function (next) {
   if (!this.isNew || (this.order !== undefined && this.order !== null)) {
@@ -35,7 +41,8 @@ columnSchema.pre<ColumnDocument>("save", async function (next) {
       .model<ColumnDocument>("Column")
       .findOne({ boardId: this.boardId })
       .sort("-order")
-      .select("order");
+      .select("order")
+      .lean();
 
     this.order = maxOrderColumn ? maxOrderColumn.order! + 1024 : 1024;
     next();

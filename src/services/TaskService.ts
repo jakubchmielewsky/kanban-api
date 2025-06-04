@@ -1,24 +1,43 @@
-import { TaskRepository } from "../repositories/repositories";
+import mongoose from "mongoose";
+import { CreateTaskInput } from "../interfaces/task/CreateTaskInput";
+import { UpdateTaskInput } from "../interfaces/task/UpdateTaskInput";
+import Task from "../models/TaskModel";
 
 class TaskService {
-  findAll(filter: any) {
-    return TaskRepository.findAll(filter);
+  async findAll(boardId: string) {
+    return await Task.aggregate([
+      {
+        $match: { boardId: new mongoose.Types.ObjectId(boardId) },
+      },
+      {
+        $lookup: {
+          from: "labels",
+          localField: "labels",
+          foreignField: "_id",
+          as: "labels",
+        },
+      },
+    ]);
   }
 
-  findById(id: string) {
-    return TaskRepository.findById(id);
+  async findOne(taskId: string) {
+    return await Task.findById(taskId).populate("labels").lean();
   }
 
-  create(data: any) {
-    return TaskRepository.create(data);
+  async create(data: CreateTaskInput) {
+    return await Task.create(data);
   }
 
-  update(id: string, updates: any) {
-    return TaskRepository.update(id, updates);
+  async update(taskId: string, updates: UpdateTaskInput) {
+    return await Task.findByIdAndUpdate(taskId, updates, {
+      new: true,
+      runValidators: true,
+      lean: true,
+    }).populate("labels");
   }
 
-  remove(id: string) {
-    return TaskRepository.delete(id);
+  async remove(taskId: string) {
+    return await Task.findByIdAndDelete(taskId).lean();
   }
 }
 
