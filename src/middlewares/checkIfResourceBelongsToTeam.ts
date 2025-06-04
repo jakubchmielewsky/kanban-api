@@ -2,6 +2,7 @@ import { NextFunction, Response, Request } from "express";
 import catchAsync from "../utils/catchAsync";
 import { Model } from "mongoose";
 import AppError from "../utils/AppError";
+import { cache } from "../utils/cache";
 
 const checkIfResourceBelongsToUsersTeam = (
   model: Model<any>,
@@ -10,7 +11,16 @@ const checkIfResourceBelongsToUsersTeam = (
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const resourceId = req.params[resourceIdName];
 
-    const resource = await model.findById(resourceId);
+    const cacheKey = `${model.modelName}${resourceId}`;
+
+    const cachedTeamId = cache.get(cacheKey);
+
+    if (cachedTeamId && cachedTeamId.toString() === req.user?.teamId) {
+      return next();
+    }
+
+    const resource = await model.findById(resourceId).select("teamId");
+    cache.set(cacheKey, resource.teamId);
 
     if (!resource || resource.teamId.toString() !== req.user?.teamId) {
       return next(

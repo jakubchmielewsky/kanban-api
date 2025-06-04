@@ -13,22 +13,17 @@ import Board from "../models/BoardModel";
 
 const boardsRouter = Express.Router({ mergeParams: true });
 
+boardsRouter.use(
+  "/:boardId",
+  checkIfResourceBelongsToUsersTeam(Board, "boardId")
+);
+
 boardsRouter.use("/:boardId/columns", columnsRouter);
 boardsRouter.use("/:boardId/tasks", tasksRouter);
 
 boardsRouter.get("/", getTeamBoards);
 boardsRouter.post("/", restrictToRole("admin", "owner"), createBoard);
-boardsRouter.patch(
-  "/:boardId",
-  checkIfResourceBelongsToUsersTeam(Board, "boardId"),
-  restrictToRole("admin", "owner"),
-  updateBoard
-);
-boardsRouter.delete(
-  "/:boardId",
-  checkIfResourceBelongsToUsersTeam(Board, "boardId"),
-  restrictToRole("admin", "owner"),
-  deleteBoard
-);
+boardsRouter.patch("/:boardId", restrictToRole("admin", "owner"), updateBoard);
+boardsRouter.delete("/:boardId", restrictToRole("admin", "owner"), deleteBoard);
 
 export default boardsRouter;
