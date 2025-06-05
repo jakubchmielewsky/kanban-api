@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
-import { TaskInterface } from "../interfaces/task/TaskInterface";
+import { TaskDocument } from "../interfaces/task/ITask";
 
-const taskSchema = new Schema<TaskInterface>(
+const taskSchema = new Schema<TaskDocument>(
   {
     title: {
       type: String,
@@ -43,20 +43,19 @@ const taskSchema = new Schema<TaskInterface>(
 
 //TODO: in the future add assigned members and deadline date
 
-taskSchema.index({ boardId: 1 });
 taskSchema.index({ columnId: 1 });
 
 taskSchema.path("createdAt").select(false);
 //taskSchema.path("updatedAt").select(false);
 
-taskSchema.pre<TaskInterface>("save", async function (next) {
+taskSchema.pre("save", async function (next) {
   if (!this.isNew || (this.order !== undefined && this.order !== null)) {
     return next();
   }
 
   try {
     const maxOrderTask = await mongoose
-      .model<TaskInterface>("Task")
+      .model<TaskDocument>("Task")
       .findOne({ columnId: this.columnId })
       .sort("-order")
       .select("order")

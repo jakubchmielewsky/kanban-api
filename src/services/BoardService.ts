@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import Board from "../models/BoardModel";
+import { cascadeDeleteBoard } from "../utils/cascadeDelete";
 
 class BoardService {
   async findAll(teamId: string) {
@@ -23,13 +25,19 @@ class BoardService {
     return updatedBoard;
   }
 
-  //TODO: cascade delete
   async delete(boardId: string) {
-    const deletedBoard = await Board.findOneAndDelete({
-      _id: boardId,
-    }).lean();
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    return deletedBoard;
+    try {
+      await cascadeDeleteBoard(new mongoose.Types.ObjectId(boardId), session);
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }
 

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { CreateTaskInput } from "../interfaces/task/CreateTaskInput";
 import { UpdateTaskInput } from "../interfaces/task/UpdateTaskInput";
 import Task from "../models/TaskModel";
+import { cascadeDeleteTask } from "../utils/cascadeDelete";
 
 class TaskService {
   async findAll(boardId: string) {
@@ -37,7 +38,18 @@ class TaskService {
   }
 
   async remove(taskId: string) {
-    return await Task.findByIdAndDelete(taskId).lean();
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      await cascadeDeleteTask(new mongoose.Types.ObjectId(taskId), session);
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }
 

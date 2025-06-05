@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import TeamMember from "../models/TeamMemberModel";
 import Team from "../models/TeamModel";
+import { cascadeDeleteTeam } from "../utils/cascadeDelete";
 
 class TeamService {
   async findAll(userId: string) {
@@ -35,14 +36,31 @@ class TeamService {
   }
 
   async create(ownerId: string, name: string) {
-    ///TODO: implement sessions here
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    const team = await Team.create({ name });
-    await TeamMember.create({
-      teamId: team._id,
-      userId: ownerId,
-      role: "owner",
-    });
+    let team;
+    try {
+      team = new Team({ name });
+      await team.save({ session });
+
+      await TeamMember.create(
+        [
+          {
+            teamId: team._id,
+            userId: ownerId,
+            role: "owner",
+          },
+        ],
+        { session }
+      );
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      await session.endSession();
+    }
 
     return team;
   }
@@ -55,9 +73,19 @@ class TeamService {
     );
   }
 
-  //TODO: cascade delete
-  remove(teamId: string) {
-    return Team.findByIdAndDelete(teamId).lean();
+  async remove(teamId: string) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      await cascadeDeleteTeam(new mongoose.Types.ObjectId(teamId), session);
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      await session.endSession();
+    }
   }
 }
 

@@ -1,5 +1,5 @@
-import mongoose, { Schema } from "mongoose";
-import { ColumnDocument } from "../interfaces/ColumnDocument";
+import mongoose, { Model, Schema } from "mongoose";
+import { ColumnDocument } from "../interfaces/IColumn";
 
 const columnSchema = new Schema<ColumnDocument>(
   {
@@ -25,7 +25,6 @@ const columnSchema = new Schema<ColumnDocument>(
 );
 
 columnSchema.index({ boardId: 1 });
-columnSchema.index({ boardId: 1, order: 1 }, { unique: true });
 columnSchema.index({ boardId: 1, name: 1 }, { unique: true });
 
 columnSchema.path("createdAt").select(false);
@@ -51,5 +50,8 @@ columnSchema.pre<ColumnDocument>("save", async function (next) {
   }
 });
 
-const Column = mongoose.model<ColumnDocument>("Column", columnSchema);
+const Column: Model<ColumnDocument> = mongoose.model<ColumnDocument>(
+  "Column",
+  columnSchema
+);
 export default Column;

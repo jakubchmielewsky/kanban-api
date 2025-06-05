@@ -1,6 +1,6 @@
 import mongoose, { Document } from "mongoose";
 
-export interface TaskInterface extends Document {
+interface TaskInterface {
   title: string;
   description: string;
   columnId: mongoose.Types.ObjectId;
@@ -10,4 +10,8 @@ export interface TaskInterface extends Document {
   order?: number;
   priority: string;
   labels: [mongoose.Types.ObjectId];
+}
+
+export interface TaskDocument extends TaskInterface, Document {
+  _id: mongoose.Types.ObjectId;
 }

@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import Column from "../models/ColumnModel";
+import { cascadeDeleteColumn } from "../utils/cascadeDelete";
 
 class ColumnService {
   async findAll(boardId: string) {
@@ -18,7 +20,18 @@ class ColumnService {
   }
 
   async remove(columnId: string) {
-    return await Column.findByIdAndDelete(columnId).lean();
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      await cascadeDeleteColumn(new mongoose.Types.ObjectId(columnId), session);
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }
 
