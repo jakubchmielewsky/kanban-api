@@ -15,11 +15,8 @@ import teamMembersRouter from "./teamMembersRouter";
 const teamsRouter = Express.Router();
 
 teamsRouter.use(protect);
-teamsRouter.use(
-  "/:teamId",
-  getRole,
-  restrictToRole("member", "admin", "owner")
-);
+teamsRouter.use("/:teamId", getRole);
+teamsRouter.use("/:teamId", restrictToRole("member", "admin", "owner"));
 
 teamsRouter.use("/:teamId/boards", boardsRouter);
 teamsRouter.use("/:teamId/labels", labelsRouter);

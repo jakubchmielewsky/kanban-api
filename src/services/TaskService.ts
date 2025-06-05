@@ -5,10 +5,10 @@ import Task from "../models/TaskModel";
 import { cascadeDeleteTask } from "../utils/cascadeDelete";
 
 class TaskService {
-  async findAll(boardId: string) {
+  async findAll(columnId: string) {
     return await Task.aggregate([
       {
-        $match: { boardId: new mongoose.Types.ObjectId(boardId) },
+        $match: { columnId: new mongoose.Types.ObjectId(columnId) },
       },
       {
         $lookup: {

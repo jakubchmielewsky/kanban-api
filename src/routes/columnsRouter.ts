@@ -9,8 +9,11 @@ import { restrictToRole } from "../middlewares/restrictToRole";
 import checkIfResourceBelongsToUsersTeam from "../middlewares/checkIfResourceBelongsToTeam";
 import Column from "../models/ColumnModel";
 import Board from "../models/BoardModel";
+import tasksRouter from "./tasksRouter";
 
 const columnsRouter = Express.Router({ mergeParams: true });
+
+columnsRouter.use("/:columnId/tasks", tasksRouter);
 
 columnsRouter.get(
   "/",

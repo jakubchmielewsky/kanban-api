@@ -7,6 +7,11 @@ const commentSchema = new Schema(
       ref: "Task",
       required: [true, "comment must belong to a task"],
     },
+    boardId: {
+      type: Schema.Types.ObjectId,
+      ref: "Board",
+      required: [true, "Comment must belong to a board"],
+    },
     teamId: {
       type: Schema.Types.ObjectId,
       ref: "Team",

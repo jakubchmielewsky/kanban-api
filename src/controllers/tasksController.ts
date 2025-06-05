@@ -4,9 +4,9 @@ import { NextFunction, Request, Response } from "express";
 import AppError from "../utils/AppError";
 
 export const getBoardTasks = catchAsync(async (req: Request, res: Response) => {
-  const boardId = req.params.boardId;
+  const columnId = req.params.columnId;
 
-  const tasks = await TaskService.findAll(boardId);
+  const tasks = await TaskService.findAll(columnId);
   res.status(200).json({ status: "success", data: tasks });
 });
 

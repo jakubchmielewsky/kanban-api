@@ -9,6 +9,8 @@ const getRole = catchAsync(
     const userId = req.user?.id;
     const teamId = req.params.teamId;
 
+    //TODO: implement cache for team members with invalidation when member's role changes
+
     const teamMember = await TeamMember.findOne({
       userId: new mongoose.Types.ObjectId(userId),
       teamId: new mongoose.Types.ObjectId(teamId),

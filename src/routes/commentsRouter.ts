@@ -21,6 +21,7 @@ commentsRouter.post(
   checkIfResourceBelongsToUsersTeam(Task, "taskId"),
   createComment
 );
+//TODO: check if user is the author of the comment
 commentsRouter.patch(
   "/:commentId",
   checkIfResourceBelongsToUsersTeam(Comment, "commentId"),
