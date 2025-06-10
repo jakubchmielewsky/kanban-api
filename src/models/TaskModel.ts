@@ -15,11 +15,6 @@ const taskSchema = new Schema<TaskDocument>(
       ref: "Column",
       required: [true, "Task must belong to a column"],
     },
-    boardId: {
-      type: Schema.Types.ObjectId,
-      ref: "Board",
-      required: [true, "Task must belong to a board"],
-    },
     teamId: {
       type: Schema.Types.ObjectId,
       ref: "Team",

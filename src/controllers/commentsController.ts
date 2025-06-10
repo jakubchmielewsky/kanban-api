@@ -16,9 +16,7 @@ export const createComment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { teamId, taskId } = req.params;
     const { content } = req.body;
-    const authorId = req.user?.id;
-
-    if (!authorId) return next(new AppError("UserId must be specified", 401));
+    const authorId = req.user.id;
 
     const comment = await CommentService.create({
       teamId,
@@ -33,11 +31,8 @@ export const createComment = catchAsync(
 export const updateComment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const commentId = req.params.commentId;
-    const commentUpdateAuthor = req.user?.id;
+    const commentUpdateAuthor = req.user.id;
     const { content } = req.body;
-
-    if (!commentUpdateAuthor)
-      return next(new AppError("UserId must be specified", 401));
 
     const comment = await CommentService.update(
       commentId,
@@ -51,10 +46,7 @@ export const updateComment = catchAsync(
 export const deleteComment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const commentId = req.params.commentId;
-    const commentUpdateAuthor = req.user?.id;
-
-    if (!commentUpdateAuthor)
-      return next(new AppError("UserId must be specified", 401));
+    const commentUpdateAuthor = req.user.id;
 
     await CommentService.remove(commentId, commentUpdateAuthor);
     res.status(204).send();

@@ -2,8 +2,11 @@ import mongoose from "mongoose";
 import TeamMember from "../models/TeamMemberModel";
 import Team from "../models/TeamModel";
 import { cascadeDeleteTeam } from "../utils/cascadeDelete";
+import { ITeamService } from "./TeamService.interface";
+import { injectable } from "tsyringe";
 
-class TeamService {
+@injectable()
+export default class TeamService implements ITeamService {
   async findAll(userId: string) {
     return await TeamMember.aggregate([
       {
@@ -65,11 +68,11 @@ class TeamService {
     return team;
   }
 
-  update(teamId: string, name: string) {
-    return Team.findByIdAndUpdate(
+  async update(teamId: string, name: string) {
+    return await Team.findByIdAndUpdate(
       teamId,
       { name },
-      { runValidators: true, new: true, lean: true }
+      { runValidators: true, new: true }
     );
   }
 
@@ -88,5 +91,3 @@ class TeamService {
     }
   }
 }
-
-export default new TeamService();

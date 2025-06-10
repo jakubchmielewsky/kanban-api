@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
