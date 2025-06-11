@@ -1,8 +1,3 @@
-import "reflect-metadata";
-import { container } from "../../src/container";
-import { TeamsController } from "../../src/controllers/teamsController";
-import { ITeamService } from "../../src/services/TeamService.interface";
-
 describe("TeamsController", () => {
   let controller: TeamsController;
   let mockService: jest.Mocked<ITeamService>;

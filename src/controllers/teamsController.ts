@@ -1,48 +1,40 @@
-import { inject, injectable } from "tsyringe";
 import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
 import { NextFunction, Request, Response } from "express";
-import { ITeamService } from "../services/TeamService.interface";
+import { create, findAll, remove, update } from "../services/TeamService";
 
-@injectable()
-export class TeamsController {
-  constructor(
-    @inject("ITeamService") private readonly teamService: ITeamService
-  ) {}
+export const getUserTeams = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
 
-  getUserTeams = catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
-      const userId = req.user?.id;
+    if (!userId) return next(new AppError("userId must be specified", 400));
 
-      if (!userId) return next(new AppError("userId must be specified", 400));
+    const teams = await findAll(userId);
+    res.status(200).json({ status: "success", data: teams });
+  }
+);
 
-      const teams = await this.teamService.findAll(userId);
-      res.status(200).json({ status: "success", data: teams });
-    }
-  );
-
-  createTeam = catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
-      const ownerId = req.user?.id;
-      const { name } = req.body;
-
-      if (!ownerId) return next(new AppError("You are not logged in", 401));
-      const team = await this.teamService.create(ownerId, name);
-      res.status(201).json({ status: "success", data: team });
-    }
-  );
-
-  updateTeam = catchAsync(async (req: Request, res: Response) => {
-    const teamId = req.params.teamId;
+export const createTeam = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const ownerId = req.user?.id;
     const { name } = req.body;
 
-    const team = await this.teamService.update(teamId, name);
-    res.status(200).json({ status: "success", data: team });
-  });
+    if (!ownerId) return next(new AppError("You are not logged in", 401));
+    const team = await create(ownerId, name);
+    res.status(201).json({ status: "success", data: team });
+  }
+);
 
-  deleteTeam = catchAsync(async (req: Request, res: Response) => {
-    const teamId = req.params.teamId;
-    await this.teamService.remove(teamId);
-    res.status(204).send();
-  });
-}
+export const updateTeam = catchAsync(async (req: Request, res: Response) => {
+  const teamId = req.params.teamId;
+  const { name } = req.body;
+
+  const team = await update(teamId, name);
+  res.status(200).json({ status: "success", data: team });
+});
+
+export const deleteTeam = catchAsync(async (req: Request, res: Response) => {
+  const teamId = req.params.teamId;
+  await remove(teamId);
+  res.status(204).send();
+});
