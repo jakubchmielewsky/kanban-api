@@ -3,6 +3,7 @@ import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
 import TeamMember from "../models/TeamMemberModel";
 import mongoose from "mongoose";
+import { param } from "express-validator";
 
 const getRole = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -20,7 +21,6 @@ const getRole = catchAsync(
       return next(new AppError("You don't have access to that resource", 403));
 
     req.user.role = teamMember.role;
-    req.user.teamId = teamMember.teamId.toString();
     next();
   }
 );

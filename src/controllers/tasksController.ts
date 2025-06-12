@@ -21,14 +21,17 @@ export const createTask = catchAsync(
     const { teamId, boardId, columnId } = req.params;
     const createdBy = req.user.id;
 
-    const task = await create({
-      title,
-      description,
-      teamId,
-      boardId,
-      columnId,
-      createdBy,
-    });
+    const task = await create(
+      {
+        title,
+        description,
+        teamId,
+        boardId,
+        columnId,
+        createdBy,
+      },
+      req.user
+    );
     res.status(201).json({ status: "success", data: task });
   }
 );
@@ -43,12 +46,12 @@ export const getTaskDetails = catchAsync(
 
 export const updateTask = catchAsync(async (req: Request, res: Response) => {
   const { taskId } = req.params;
-  const task = await update(taskId, req.body);
+  const task = await update(taskId, req.body, req.user);
   res.status(200).json({ status: "success", data: task });
 });
 
 export const deleteTask = catchAsync(async (req: Request, res: Response) => {
-  const { taskId } = req.params;
-  await remove(taskId);
+  const { taskId, teamId } = req.params;
+  await remove(taskId, teamId, req.user);
   res.status(204).send();
 });

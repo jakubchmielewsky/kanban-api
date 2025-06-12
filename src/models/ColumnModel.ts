@@ -27,9 +27,6 @@ const columnSchema = new Schema<ColumnDocument>(
 columnSchema.index({ boardId: 1 });
 columnSchema.index({ boardId: 1, name: 1 }, { unique: true });
 
-columnSchema.path("createdAt").select(false);
-columnSchema.path("updatedAt").select(false);
-
 columnSchema.pre<ColumnDocument>("save", async function (next) {
   if (!this.isNew || (this.order !== undefined && this.order !== null)) {
     return next();

@@ -40,9 +40,6 @@ const taskSchema = new Schema<TaskDocument>(
 
 taskSchema.index({ columnId: 1 });
 
-taskSchema.path("createdAt").select(false);
-//taskSchema.path("updatedAt").select(false);
-
 taskSchema.pre("save", async function (next) {
   if (!this.isNew || (this.order !== undefined && this.order !== null)) {
     return next();

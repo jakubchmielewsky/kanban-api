@@ -11,6 +11,7 @@ import protect from "../middlewares/protect";
 import getRole from "../middlewares/getRole";
 import { restrictToRole } from "../middlewares/restrictToRole";
 import teamMembersRouter from "./teamMembersRouter";
+import activitiesRouter from "./activitiesRouter";
 
 const teamsRouter = Express.Router();
 
@@ -21,6 +22,7 @@ teamsRouter.use("/:teamId", restrictToRole("member", "admin", "owner"));
 teamsRouter.use("/:teamId/boards", boardsRouter);
 teamsRouter.use("/:teamId/labels", labelsRouter);
 teamsRouter.use("/:teamId/members", teamMembersRouter);
+teamsRouter.use("/:teamId/activities", activitiesRouter);
 
 teamsRouter.get("/", getUserTeams);
 teamsRouter.post("/", createTeam);

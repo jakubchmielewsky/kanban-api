@@ -1,17 +1,36 @@
 import mongoose from "mongoose";
 import Board from "../models/BoardModel";
 import { cascadeDeleteBoard } from "../utils/cascadeDelete";
+import Activity from "../models/ActivityModel";
+import AppError from "../utils/AppError";
 
 export const findAll = async (teamId: string) => {
   return await Board.find({ teamId }).lean();
 };
 
-export const create = async (teamId: string, name: string) => {
-  return await Board.create({ teamId, name });
+export const create = async (
+  teamId: string,
+  name: string,
+  user: Express.User
+) => {
+  const board = await Board.create({ teamId, name });
+  await Activity.create({
+    teamId: board.teamId,
+    performedBy: user.name || user.email,
+    action: "create",
+    entityType: Board.modelName,
+    targetEntityId: board._id,
+    targetEntityName: board.name,
+  });
+  return board;
 };
 
-export const update = async (boardId: string, name: string) => {
-  const updatedBoard = await Board.findByIdAndUpdate(
+export const update = async (
+  boardId: string,
+  name: string,
+  user: Express.User
+) => {
+  const board = await Board.findByIdAndUpdate(
     boardId,
     { name },
     {
@@ -21,15 +40,36 @@ export const update = async (boardId: string, name: string) => {
     }
   );
 
-  return updatedBoard;
+  if (!board) {
+    throw new AppError("Board not found", 404);
+  }
+
+  await Activity.create({
+    teamId: board.teamId,
+    performedBy: user.name || user.email,
+    action: "update",
+    entityType: Board.modelName,
+    targetEntityId: board._id,
+    targetEntityName: board.name,
+  });
+
+  return board;
 };
 
-export const remove = async (boardId: string) => {
+export const remove = async (
+  boardId: string,
+  teamId: string,
+  user: Express.User
+) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
+  let board;
   try {
-    await cascadeDeleteBoard(new mongoose.Types.ObjectId(boardId), session);
+    board = await cascadeDeleteBoard(
+      new mongoose.Types.ObjectId(boardId),
+      session
+    );
     await session.commitTransaction();
   } catch (error) {
     await session.abortTransaction();
@@ -37,4 +77,17 @@ export const remove = async (boardId: string) => {
   } finally {
     session.endSession();
   }
+
+  if (!board) {
+    throw new AppError("Board not found", 404);
+  }
+
+  await Activity.create({
+    teamId: teamId,
+    performedBy: user.name || user.email,
+    action: "delete",
+    entityType: Board.modelName,
+    targetEntityId: boardId,
+    targetEntityName: board.name,
+  });
 };

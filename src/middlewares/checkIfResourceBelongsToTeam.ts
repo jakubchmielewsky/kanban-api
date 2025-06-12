@@ -15,14 +15,14 @@ const checkIfResourceBelongsToUsersTeam = (
 
     const cachedTeamId = cache.get(cacheKey);
 
-    if (cachedTeamId && cachedTeamId.toString() === req.user?.teamId) {
+    if (cachedTeamId && cachedTeamId.toString() === req.params.teamId) {
       return next();
     }
 
     const resource = await model.findById(resourceId).select("teamId");
     cache.set(cacheKey, resource.teamId);
 
-    if (resource && resource.teamId.toString() !== req.user?.teamId) {
+    if (resource && resource.teamId.toString() !== req.params.teamId) {
       return next(
         new AppError("You don't have an access to that resource", 403)
       );

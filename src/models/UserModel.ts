@@ -25,7 +25,6 @@ const userSchema = new Schema<UserInterface>(
       type: String,
       required: true,
       validate: {
-        // This only works on CREATE and SAVE!!!
         validator: function (this: UserInterface, val: string) {
           return val === this.password;
         },

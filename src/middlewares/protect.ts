@@ -24,7 +24,9 @@ const protect = catchAsync(
       process.env.JWT_SECRET as string
     )) as JwtPayload;
 
-    const currentUser = await User.findById(decodedTokenData.id);
+    const currentUser = await User.findById(decodedTokenData.id)
+      .select("_id email name")
+      .lean();
 
     if (!currentUser) {
       return next(
@@ -32,7 +34,7 @@ const protect = catchAsync(
       );
     }
 
-    req.user = { id: String(currentUser._id) };
+    req.user = { ...currentUser, id: currentUser._id.toString() };
 
     next();
   }

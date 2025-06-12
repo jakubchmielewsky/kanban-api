@@ -21,8 +21,10 @@ export async function cascadeDeleteTeam(
     await cascadeDeleteBoard(board._id, session);
   }
 
-  await Team.deleteOne({ _id: teamId }).session(session);
+  const team = await Team.findOneAndDelete({ _id: teamId }).session(session);
   await TeamMember.deleteMany({ teamId }).session(session);
+
+  return team;
 }
 
 export async function cascadeDeleteBoard(
@@ -37,7 +39,7 @@ export async function cascadeDeleteBoard(
     await cascadeDeleteColumn(column._id, session);
   }
 
-  await Board.deleteOne({ _id: boardId }).session(session);
+  return await Board.findOneAndDelete({ _id: boardId }).session(session);
 }
 
 export async function cascadeDeleteColumn(
@@ -52,7 +54,7 @@ export async function cascadeDeleteColumn(
     await cascadeDeleteTask(task._id, session);
   }
 
-  await Column.deleteOne({ _id: columnId }).session(session);
+  return await Column.findOneAndDelete({ _id: columnId }).session(session);
 }
 
 export async function cascadeDeleteTask(
@@ -61,5 +63,5 @@ export async function cascadeDeleteTask(
 ) {
   await Comment.deleteMany({ taskId }).session(session);
 
-  await Task.deleteOne({ taskId }).session(session);
+  return await Task.findOneAndDelete({ _id: taskId }).session(session);
 }
