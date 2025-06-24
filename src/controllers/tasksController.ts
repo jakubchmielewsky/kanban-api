@@ -3,6 +3,7 @@ import {
   create,
   findAll,
   findOne,
+  moveToColumn,
   remove,
   update,
 } from "../services/TaskService";
@@ -49,6 +50,16 @@ export const updateTask = catchAsync(async (req: Request, res: Response) => {
   const task = await update(taskId, req.body, req.user);
   res.status(200).json({ status: "success", data: task });
 });
+
+export const moveTaskToColumn = catchAsync(
+  async (req: Request, res: Response) => {
+    const { taskId } = req.params;
+    const { targetColumnId } = req.body;
+
+    const task = await moveToColumn(taskId, targetColumnId);
+    res.status(200).json({ status: "success", data: task });
+  }
+);
 
 export const deleteTask = catchAsync(async (req: Request, res: Response) => {
   const { taskId, teamId } = req.params;

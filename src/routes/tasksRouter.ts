@@ -4,6 +4,7 @@ import {
   deleteTask,
   getBoardTasks,
   getTaskDetails,
+  moveTaskToColumn,
   updateTask,
 } from "../controllers/tasksController";
 import commentsRouter from "./commentsRouter";
@@ -37,6 +38,11 @@ tasksRouter.patch(
   "/:taskId",
   checkIfResourceBelongsToUsersTeam(Task, "taskId"),
   updateTask
+);
+tasksRouter.patch(
+  "/:taskId/move",
+  checkIfResourceBelongsToUsersTeam(Task, "taskId"),
+  moveTaskToColumn
 );
 tasksRouter.delete(
   "/:taskId",

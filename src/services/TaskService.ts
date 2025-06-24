@@ -65,6 +65,14 @@ export const update = async (
   return task;
 };
 
+export const moveToColumn = async (taskId: string, targetColumnId: string) => {
+  const task = await Task.findByIdAndUpdate(
+    taskId,
+    { columnId: targetColumnId },
+    { new: true, runValidators: true, lean: true }
+  );
+};
+
 export const remove = async (
   taskId: string,
   teamId: string,
