@@ -9,6 +9,7 @@ import usersRouter from "./routes/usersRouter";
 import globalErrorController from "./controllers/globalErrorController";
 import AppError from "./utils/AppError";
 import teamsRouter from "./routes/teamsRouter";
+import invitationsRouter from "./routes/invitationsRouter";
 
 const app = Express();
 
@@ -46,6 +47,7 @@ app.use("/", (req, res, next) => {
 
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/teams", teamsRouter);
+app.use("/api/v1/invitations", invitationsRouter);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));

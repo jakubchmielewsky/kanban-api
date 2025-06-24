@@ -1,6 +1,5 @@
 import Express from "express";
 import {
-  addMember,
   changeMemberRole,
   deleteMember,
   getMembersList,
@@ -10,7 +9,6 @@ import { restrictToRole } from "../middlewares/restrictToRole";
 const teamMembersRouter = Express.Router({ mergeParams: true });
 
 teamMembersRouter.get("/", getMembersList);
-teamMembersRouter.post("/", restrictToRole("owner", "admin"), addMember);
 teamMembersRouter.patch(
   "/:userId",
   restrictToRole("owner", "admin"),

@@ -30,7 +30,7 @@ const invitationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now, expires: "7d" },
 });
 
-invitationSchema.index({ invitee: 1 });
+invitationSchema.index({ inviteeId: 1 });
 invitationSchema.index({ teamId: 1, inviteeId: 1 }, { unique: true });
 
 const Invitation = mongoose.model("Invitation", invitationSchema);
