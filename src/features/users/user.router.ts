@@ -1,13 +1,10 @@
-import Express from "express";
-import { registerUser, loginUser, logoutUser } from "./auth.controller";
-import { getUser } from "./user.controller";
+import { Router } from "express";
+import { getMe } from "./user.controller";
 import protect from "../../middlewares/protect";
 
-const usersRouter = Express.Router();
+const router = Router();
 
-usersRouter.post("/register", registerUser);
-usersRouter.post("/login", loginUser);
-usersRouter.get("/logout", logoutUser);
-usersRouter.get("/me", protect, getUser);
+router.use(protect);
+router.get("/me", getMe);
 
-export default usersRouter;
+export default router;

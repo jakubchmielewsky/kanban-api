@@ -10,6 +10,7 @@ import globalErrorController from "./middlewares/globalErrorHandler";
 import AppError from "./utils/AppError";
 import teamsRouter from "./features/teams/team.router";
 import invitationsRouter from "./features/invitations/invitation.router";
+import authRouter from "./features/auth/auth.router";
 
 const app = Express();
 
@@ -45,6 +46,7 @@ app.use("/", (req, res, next) => {
   next();
 });
 
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/teams", teamsRouter);
 app.use("/api/v1/invitations", invitationsRouter);
