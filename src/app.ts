@@ -5,11 +5,11 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import ExpressMongoSanitize from "express-mongo-sanitize";
-import usersRouter from "./routes/usersRouter";
-import globalErrorController from "./controllers/globalErrorController";
+import usersRouter from "./features/users/user.router";
+import globalErrorController from "./middlewares/globalErrorHandler";
 import AppError from "./utils/AppError";
-import teamsRouter from "./routes/teamsRouter";
-import invitationsRouter from "./routes/invitationsRouter";
+import teamsRouter from "./features/teams/team.router";
+import invitationsRouter from "./features/invitations/invitation.router";
 
 const app = Express();
 

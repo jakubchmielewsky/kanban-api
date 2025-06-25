@@ -1,6 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import { JwtPayload } from "jsonwebtoken";
-import User from "../models/UserModel";
+import User from "../features/users/user.model";
 import AppError from "../utils/AppError";
 import { verifyToken } from "../utils/jwt";
 import catchAsync from "../utils/catchAsync";

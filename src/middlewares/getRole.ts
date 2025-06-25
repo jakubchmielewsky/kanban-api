@@ -1,7 +1,7 @@
 import { NextFunction, Response, Request } from "express";
 import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
-import TeamMember from "../models/TeamMemberModel";
+import TeamMember from "../features/teamMembers/teamMember.model";
 import mongoose from "mongoose";
 import { param } from "express-validator";
 

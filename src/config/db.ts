@@ -1,7 +1,4 @@
 import mongoose from "mongoose";
-import Board from "../models/BoardModel";
-import Column from "../models/ColumnModel";
-import Task from "../models/TaskModel";
 
 export function connectDB() {
   mongoose
@@ -11,8 +8,8 @@ export function connectDB() {
 
       // await Promise.all([
       //   Board.syncIndexes(),
-      //   Column.syncIndexes(),
-      //   Task.syncIndexes(),
+      //   List.syncIndexes(),
+      //   Card.syncIndexes(),
       // ]);
 
       // console.log("Indexes synchronized");
