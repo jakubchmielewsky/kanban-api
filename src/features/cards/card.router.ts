@@ -15,10 +15,12 @@ import checkIfResourceBelongsToUsersTeam from "../../middlewares/checkIfResource
 import Card from "./card.model";
 import List from "../lists/list.model";
 import Label from "../labels/label.model";
+import checklistsRouter from "../checklists/checklist.router";
 
 const cardsRouter = Express.Router({ mergeParams: true });
 
 cardsRouter.use("/:cardId/comments", commentsRouter);
+cardsRouter.use("/:cardId/checklists", checklistsRouter);
 
 cardsRouter.get(
   "/",
