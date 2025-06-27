@@ -1,9 +1,10 @@
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { connectDB } from "./config/db";
+import { connectDB } from "./config/mongo";
 
 dotenv.config({ path: ".env" });
+import "./config/redis";
 
 process.on("uncaughtException", (err) => {
   console.error("💥 Uncaught exception:", err);

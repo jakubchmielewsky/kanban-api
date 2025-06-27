@@ -4,7 +4,7 @@ export function connectDB() {
   mongoose
     .connect(process.env.MONGO_URI as string)
     .then(async () => {
-      console.log("🚀 MongoDB connected successfully!");
+      console.log("🚀 Connected to MongoDB");
 
       // await Promise.all([
       //   Board.syncIndexes(),
