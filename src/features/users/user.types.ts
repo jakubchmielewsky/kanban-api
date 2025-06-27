@@ -1,8 +1,12 @@
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-export default interface UserInterface extends Document {
+export default interface UserDocument extends Document {
+  _id: string | mongoose.Types.ObjectId;
   name: string;
   avatarUrl: string;
+  isVerified: boolean;
+  verificationToken?: String;
+  verificationTokenExpires?: Date;
   email: string;
   password: string;
   active: boolean;
@@ -11,4 +15,5 @@ export default interface UserInterface extends Document {
     candidatePassword: string,
     userPassword: string
   ): Promise<boolean>;
+  createVerificationToken(): string;
 }
