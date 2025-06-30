@@ -6,6 +6,7 @@ import {
   loginUser,
   logoutUser,
   verifyUser,
+  resendVerificationEmail,
 } from "./auth.service";
 import UserDocument from "../users/user.types";
 
@@ -37,6 +38,21 @@ export const login = catchAsync(
     const { user, token } = await loginUser({ email, password });
 
     sendToken(user, token, res);
+  }
+);
+
+export const resend = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+
+    if (!email) return next(new AppError("Please provide an email!", 400));
+
+    await resendVerificationEmail(email);
+
+    res.status(200).json({
+      status: "success",
+      message: "Verification email sent successfully!",
+    });
   }
 );
 

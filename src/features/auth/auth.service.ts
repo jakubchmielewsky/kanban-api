@@ -7,6 +7,17 @@ import { queueEmail } from "../emails/email.queue";
 import crypto from "crypto";
 import UserDocument from "../users/user.types";
 
+const sendVerificationEmail = async (user: UserDocument) => {
+  const verificationToken = user.createVerificationToken();
+  await user.save({ validateBeforeSave: false });
+
+  await queueEmail({
+    to: user.email,
+    subject: "Verify your email",
+    html: `<p>Your verification token is: <strong>${verificationToken}</strong></p>`, //TODO: create a proper email template
+  });
+};
+
 export const registerUser = async ({
   email,
   password,
@@ -14,16 +25,23 @@ export const registerUser = async ({
 }: RegisterPayload) => {
   const user = await User.create({ email, password, passwordConfirm });
 
-  const verificationToken = user.createVerificationToken();
-  await user.save({ validateBeforeSave: false });
-
-  queueEmail({
-    to: user.email,
-    subject: "Verify your email",
-    html: `<p>Your verification token is: <strong>${verificationToken}</strong></p>`, //TODO: create a proper email template
-  });
+  await sendVerificationEmail(user);
 
   return user;
+};
+
+export const resendVerificationEmail = async (email: string) => {
+  const user = await User.findOne({ email });
+
+  console.log(user);
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+  if (user.isVerified) {
+    throw new AppError("User is already verified", 400);
+  }
+  await sendVerificationEmail(user);
 };
 
 export const loginUser = async ({ email, password }: LoginPayload) => {
@@ -55,6 +73,9 @@ export const verifyUser = async (verificationToken: string) => {
   if (!user) {
     throw new AppError("Verification token is invalid or has expired", 400);
   }
+  if (user.isVerified) {
+    throw new AppError("User is already verified", 400);
+  }
 
   user.isVerified = true;
   user.verificationToken = undefined;
@@ -65,20 +86,6 @@ export const verifyUser = async (verificationToken: string) => {
   const token = signToken(user._id.toString());
 
   return { user, token };
-};
-
-export const createAndSendToken = (
-  user: any,
-  statusCode: number,
-  res: Response
-) => {
-  const token = signToken(user._id.toString());
-  res.cookie("jwt", token);
-  res.status(statusCode).json({
-    status: "success",
-    token,
-    data: { user: { id: user._id, email: user.email } },
-  });
 };
 
 export const logoutUser = (res: Response) => {
