@@ -1,7 +1,7 @@
 import mongoose, { Document } from "mongoose";
 
 export default interface UserDocument extends Document {
-  _id: string | mongoose.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   name: string;
   avatarUrl: string;
   isVerified: boolean;

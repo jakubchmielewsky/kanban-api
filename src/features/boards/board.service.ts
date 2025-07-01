@@ -3,34 +3,18 @@ import Board from "./board.model";
 import { cascadeDeleteBoard } from "../../utils/cascadeDelete";
 import Activity from "./board.model";
 import AppError from "../../utils/AppError";
+import { CreateBoardPayload, UpdateBoardPayload } from "./board.types";
 
 export const findAll = async (teamId: string) => {
   return await Board.find({ teamId }).lean();
 };
 
-export const create = async (
-  teamId: string,
-  name: string,
-  user: Express.User
-) => {
-  const board = await Board.create({ teamId, name });
-  await Activity.create({
-    teamId: board.teamId,
-    performedBy: user.name || user.email,
-    action: "create",
-    entityType: Board.modelName,
-    targetEntityId: board._id,
-    targetEntityName: board.name,
-  });
-  return board;
+export const create = async ({ teamId, name }: CreateBoardPayload) => {
+  return await Board.create({ teamId, name });
 };
 
-export const update = async (
-  boardId: string,
-  name: string,
-  user: Express.User
-) => {
-  const board = await Board.findByIdAndUpdate(
+export const update = async ({ boardId, name }: UpdateBoardPayload) => {
+  return await Board.findByIdAndUpdate(
     boardId,
     { name },
     {
@@ -39,28 +23,9 @@ export const update = async (
       lean: true,
     }
   );
-
-  if (!board) {
-    throw new AppError("Board not found", 404);
-  }
-
-  await Activity.create({
-    teamId: board.teamId,
-    performedBy: user.name || user.email,
-    action: "update",
-    entityType: Board.modelName,
-    targetEntityId: board._id,
-    targetEntityName: board.name,
-  });
-
-  return board;
 };
 
-export const remove = async (
-  boardId: string,
-  teamId: string,
-  user: Express.User
-) => {
+export const remove = async (boardId: string) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -77,17 +42,4 @@ export const remove = async (
   } finally {
     session.endSession();
   }
-
-  if (!board) {
-    throw new AppError("Board not found", 404);
-  }
-
-  await Activity.create({
-    teamId: teamId,
-    performedBy: user.name || user.email,
-    action: "delete",
-    entityType: Board.modelName,
-    targetEntityId: boardId,
-    targetEntityName: board.name,
-  });
 };

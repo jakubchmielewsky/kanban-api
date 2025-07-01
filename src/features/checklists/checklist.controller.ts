@@ -36,7 +36,8 @@ export const updateChecklist = catchAsync(
     const checklistId = req.params.checklistId;
     const { title, description } = req.body;
 
-    const updatedChecklist = await updateChecklistService(checklistId, {
+    const updatedChecklist = await updateChecklistService({
+      checklistId,
       title,
       description,
     });
@@ -58,9 +59,9 @@ export const addChecklistItem = catchAsync(
     const checklistId = req.params.checklistId;
     const { title, completed } = req.body;
 
-    const updatedChecklist = await addChecklistItemService(checklistId, {
-      title,
-      completed,
+    const updatedChecklist = await addChecklistItemService({
+      checklistId,
+      item: { title, completed },
     });
     res.status(200).json({ status: "success", data: updatedChecklist });
   }
@@ -71,9 +72,10 @@ export const updateChecklistItem = catchAsync(
     const { checklistId, itemId } = req.params;
     const { title, completed } = req.body;
 
-    const updatedItem = await updateChecklistItemService(checklistId, itemId, {
-      title,
-      completed,
+    const updatedItem = await updateChecklistItemService({
+      checklistId,
+      itemId,
+      updates: { title, completed },
     });
     res.status(200).json({ status: "success", data: updatedItem });
   }
@@ -84,10 +86,10 @@ export const deleteChecklistItem = catchAsync(
     const checklistId = req.params.checklistId;
     const itemId = req.params.itemId;
 
-    const updatedChecklist = await deleteChecklistItemService(
+    const updatedChecklist = await deleteChecklistItemService({
       checklistId,
-      itemId
-    );
+      itemId,
+    });
     res.status(200).json({ status: "success", data: updatedChecklist });
   }
 );

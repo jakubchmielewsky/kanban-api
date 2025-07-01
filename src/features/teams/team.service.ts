@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import TeamMember from "../teamMembers/teamMember.model";
 import Team from "./team.model";
 import { cascadeDeleteTeam } from "../../utils/cascadeDelete";
+import { CreateTeamInput, UpdateTeamInput } from "./team.types";
 
 export const findAll = async (userId: string) => {
   return await TeamMember.aggregate([
@@ -34,7 +35,7 @@ export const findAll = async (userId: string) => {
   ]);
 };
 
-export const create = async (ownerId: string, name: string) => {
+export const create = async ({ ownerId, name }: CreateTeamInput) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -44,15 +45,10 @@ export const create = async (ownerId: string, name: string) => {
     await team.save({ session });
 
     await TeamMember.create(
-      [
-        {
-          teamId: team._id,
-          userId: ownerId,
-          role: "owner",
-        },
-      ],
+      [{ teamId: team._id, userId: ownerId, role: "owner" }],
       { session }
     );
+
     await session.commitTransaction();
   } catch (error) {
     await session.abortTransaction();
@@ -64,8 +60,8 @@ export const create = async (ownerId: string, name: string) => {
   return team;
 };
 
-export const update = async (teamId: string, name: string) => {
-  return await Team.findByIdAndUpdate(
+export const update = async ({ teamId, name }: UpdateTeamInput) => {
+  return Team.findByIdAndUpdate(
     teamId,
     { name },
     { runValidators: true, new: true, lean: true }

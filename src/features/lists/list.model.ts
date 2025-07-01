@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { ListDocument } from "./types/IList";
+import { ListDocument } from "./list.types";
 
 const listSchema = new Schema<ListDocument>(
   {

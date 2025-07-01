@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ref } from "process";
 
 const activitySchema = new mongoose.Schema({
   teamId: {
@@ -7,7 +8,8 @@ const activitySchema = new mongoose.Schema({
     required: [true, "Team ID is required"],
   },
   performedBy: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: [true, "Performed By is required"],
   },
   action: {
@@ -15,16 +17,10 @@ const activitySchema = new mongoose.Schema({
     enum: ["create", "update", "delete", "add_label", "remove_label"],
     required: [true, "Action is required"],
   },
-  entityType: {
-    type: String,
-    required: [true, "Entity Type is required"],
-  },
-  targetEntityId: {
+  cardId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: [true, "Entity ID is required"],
-  },
-  targetEntityName: {
-    type: String,
+    ref: "Card",
+    required: [true, "Card ID is required"],
   },
   performedAt: {
     type: Date,
@@ -33,7 +29,7 @@ const activitySchema = new mongoose.Schema({
   },
 });
 
-activitySchema.index({ teamId: 1 });
+activitySchema.index({ cardId: 1 });
 
 const Activity = mongoose.model("Activity", activitySchema);
 export default Activity;

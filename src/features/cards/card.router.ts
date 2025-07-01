@@ -5,7 +5,7 @@ import {
   deleteCard,
   getBoardCards,
   getCardDetails,
-  moveCardToList,
+  moveCard,
   removeLabelFromCard,
   updateCard,
 } from "./card.controller";
@@ -53,7 +53,7 @@ cardsRouter.delete(
 cardsRouter.patch(
   "/:cardId/move",
   checkIfResourceBelongsToUsersTeam(Card, "cardId"),
-  moveCardToList
+  moveCard
 );
 
 // Card labels routes

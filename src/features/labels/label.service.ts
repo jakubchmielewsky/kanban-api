@@ -1,69 +1,18 @@
-import Activity from "../activities/activity.model";
 import Label from "./label.model";
-import AppError from "../../utils/AppError";
+import { CreateLabelInput, UpdateLabelInput } from "./label.types";
 
 export const findAll = (teamId: string) => {
   return Label.find({ teamId }).lean();
 };
 
-export const create = async (
-  data: {
-    teamId: string;
-    name: string;
-    color: string;
-  },
-  user: Express.User
-) => {
-  const label = await Label.create(data);
-
-  await Activity.create({
-    teamId: label.teamId,
-    performedBy: user.name || user.email,
-    action: "create",
-    entityType: Label.modelName,
-    targetEntityId: label._id,
-  });
-
-  return label;
+export const create = async (data: CreateLabelInput) => {
+  return Label.create(data);
 };
 
-export const update = async (
-  labelId: string,
-  updates: { name: string; color: string },
-  user: Express.User
-) => {
-  const label = await Label.findByIdAndUpdate(labelId, updates);
-
-  if (!label) {
-    throw new AppError("Label not found", 404);
-  }
-
-  await Activity.create({
-    teamId: label.teamId,
-    performedBy: user.name || user.email,
-    action: "update",
-    entityType: Label.modelName,
-    targetEntityId: label._id,
-    targetEntityName: label.name,
-  });
-
-  return label;
+export const update = async (labelId: string, updates: UpdateLabelInput) => {
+  return Label.findByIdAndUpdate(labelId, updates, { new: true });
 };
 
-export const remove = async (labelId: string, user: Express.User) => {
-  const label = await Label.findByIdAndDelete(labelId);
-
-  if (!label) {
-    throw new AppError("Label not found", 404);
-  }
-
-  await Activity.create({
-    teamId: label.teamId,
-    performedBy: user.name || user.email,
-    action: "delete",
-    entityType: Label.modelName,
-    targetEntityId: label._id,
-  });
-
-  return label;
+export const remove = async (labelId: string) => {
+  return Label.findByIdAndDelete(labelId);
 };

@@ -2,6 +2,7 @@ import AppError from "../../utils/AppError";
 import catchAsync from "../../utils/catchAsync";
 import { NextFunction, Request, Response } from "express";
 import { create, findAll, remove, update } from "./team.service";
+import { CreateTeamInput, UpdateTeamInput } from "./team.types";
 
 export const getUserTeams = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -14,22 +15,21 @@ export const getUserTeams = catchAsync(
   }
 );
 
-export const createTeam = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const ownerId = req.user?.id;
-    const { name } = req.body;
+export const createTeam = catchAsync(async (req: Request, res: Response) => {
+  const ownerId = req.user?.id;
+  if (!ownerId) throw new AppError("You are not logged in", 401);
 
-    if (!ownerId) return next(new AppError("You are not logged in", 401));
-    const team = await create(ownerId, name);
-    res.status(201).json({ status: "success", data: team });
-  }
-);
+  const input: CreateTeamInput = { ownerId, name: req.body.name };
+  const team = await create(input);
+  res.status(201).json({ status: "success", data: team });
+});
 
 export const updateTeam = catchAsync(async (req: Request, res: Response) => {
-  const teamId = req.params.teamId;
-  const { name } = req.body;
-
-  const team = await update(teamId, name);
+  const input: UpdateTeamInput = {
+    teamId: req.params.teamId,
+    name: req.body.name,
+  };
+  const team = await update(input);
   res.status(200).json({ status: "success", data: team });
 });
 

@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { CardDocument } from "./types/ICard";
+import { CardDocument } from "./card.types";
 
 const cardSchema = new Schema<CardDocument>(
   {
@@ -21,11 +21,6 @@ const cardSchema = new Schema<CardDocument>(
       required: [true, "Card must belong to a team"],
     },
     order: Number,
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "Card must have author"],
-    },
     labels: {
       type: [Schema.Types.ObjectId],
       ref: "Label",

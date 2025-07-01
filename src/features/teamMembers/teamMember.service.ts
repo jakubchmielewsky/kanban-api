@@ -1,18 +1,21 @@
 import TeamMember from "./teamMember.model";
+import {
+  CreateMemberInput,
+  UpdateMemberInput,
+  RemoveMemberInput,
+} from "./teamMember.types";
 
 export const findAllMembers = (teamId: string) => {
   return TeamMember.find({ teamId }).lean();
 };
 
-export const createMember = async (
-  teamId: string,
-  userId: string,
-  role: string = "member"
-) => {
+export const createMember = async (input: CreateMemberInput) => {
+  const { teamId, userId, role = "member" } = input;
   return TeamMember.create({ teamId, userId, role });
 };
 
-export const updateMember = (teamId: string, userId: string, role: string) => {
+export const updateMember = (input: UpdateMemberInput) => {
+  const { teamId, userId, role } = input;
   return TeamMember.findOneAndUpdate(
     { teamId, userId },
     { role },
@@ -20,6 +23,7 @@ export const updateMember = (teamId: string, userId: string, role: string) => {
   );
 };
 
-export const removeMember = (teamId: string, userId: string) => {
+export const removeMember = (input: RemoveMemberInput) => {
+  const { teamId, userId } = input;
   return TeamMember.findOneAndDelete({ teamId, userId }).lean();
 };

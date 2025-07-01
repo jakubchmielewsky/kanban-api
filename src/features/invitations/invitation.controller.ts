@@ -23,37 +23,55 @@ export const createInvitation = catchAsync(
     const { role, userQuery } = req.body;
     const inviterId = req.user.id;
 
-    const invitation = await invite(teamId, userQuery, inviterId, role);
+    const invitation = await invite({
+      teamId,
+      userQuery,
+      role,
+      inviterId,
+    });
+
     res.status(201).json({ status: "success", data: invitation });
   }
 );
 
 export const acceptInvitation = catchAsync(
   async (req: Request, res: Response) => {
-    const { invitationId } = req.params;
     const userId = req.user.id;
+    const invitationId = req.params.invitationId;
 
-    const updatedInvitation = await accept(invitationId, userId);
+    const updatedInvitation = await accept({
+      invitationId,
+      userId,
+    });
+
     res.status(200).json({ status: "success", data: updatedInvitation });
   }
 );
 
 export const rejectInvitation = catchAsync(
   async (req: Request, res: Response) => {
-    const { invitationId } = req.params;
     const userId = req.user.id;
+    const invitationId = req.params.invitationId;
 
-    const updatedInvitation = await reject(invitationId, userId);
+    const updatedInvitation = await reject({
+      invitationId,
+      userId,
+    });
+
     res.status(200).json({ status: "success", data: updatedInvitation });
   }
 );
 
 export const cancelInvitation = catchAsync(
   async (req: Request, res: Response) => {
-    const { invitationId } = req.params;
     const userId = req.user.id;
+    const invitationId = req.params.invitationId;
 
-    await cancel(invitationId, userId);
+    await cancel({
+      invitationId,
+      userId,
+    });
+
     res.status(204).send();
   }
 );

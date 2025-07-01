@@ -14,20 +14,22 @@ export const createList = catchAsync(async (req: Request, res: Response) => {
   const boardId = req.params.boardId;
   const { name } = req.body;
 
-  const list = await create({ teamId, boardId, name }, req.user);
+  const list = await create({ teamId, boardId, name });
+
   res.status(201).json({ status: "success", data: list });
 });
 
 export const updateList = catchAsync(async (req: Request, res: Response) => {
   const listId = req.params.listId;
+  const { name, order } = req.body;
 
-  const list = await update(listId, req.body, req.user);
+  const list = await update(listId, { name, order });
   res.status(200).json({ status: "success", data: list });
 });
 
 export const deleteList = catchAsync(async (req: Request, res: Response) => {
-  const { listId, teamId } = req.params;
+  const { listId } = req.params;
 
-  await remove(listId, teamId, req.user);
+  await remove(listId);
   res.status(204).send();
 });

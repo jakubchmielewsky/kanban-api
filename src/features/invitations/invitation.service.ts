@@ -2,17 +2,20 @@ import Invitation from "./invitation.model";
 import User from "../users/user.model";
 import AppError from "../../utils/AppError";
 import { createMember } from "../teamMembers/teamMember.service";
+import { InviteInput, HandleInvitationInput } from "./invitation.types";
 
 export const findAllInvitations = async (userId: string) => {
-  return await Invitation.find({ inviteeId: userId }).lean();
+  return Invitation.aggregate([
+    { $match: { inviteeId: userId } },
+    {
+      $match: { status: "pending" },
+    },
+  ]);
 };
 
-export const invite = async (
-  teamId: string,
-  userQuery: string,
-  inviterId: string,
-  role: string
-) => {
+export const invite = async (data: InviteInput) => {
+  const { userQuery, teamId, inviterId, role } = data;
+
   if (!userQuery) {
     throw new AppError("User query required!", 400);
   }
@@ -23,7 +26,7 @@ export const invite = async (
 
   if (!invitee) throw new AppError("User not found!", 404);
 
-  return await Invitation.create({
+  return Invitation.create({
     teamId,
     inviteeId: invitee._id,
     inviterId,
@@ -31,7 +34,10 @@ export const invite = async (
   });
 };
 
-export const accept = async (invitationId: string, userId: string) => {
+export const accept = async ({
+  invitationId,
+  userId,
+}: HandleInvitationInput) => {
   const invitation = await Invitation.findById(invitationId);
 
   if (!invitation) throw new AppError("Invitation not found!", 404);
@@ -47,17 +53,20 @@ export const accept = async (invitationId: string, userId: string) => {
     throw new AppError("Invitation is not pending!", 400);
   }
 
-  await createMember(
-    invitation.teamId.toString(),
-    invitation.inviteeId.toString(),
-    invitation.role
-  );
+  await createMember({
+    teamId: invitation.teamId.toString(),
+    userId: invitation.inviteeId.toString(),
+    role: invitation.role,
+  });
 
   invitation.status = "accepted";
-  return await invitation.save();
+  return invitation.save();
 };
 
-export const reject = async (invitationId: string, userId: string) => {
+export const reject = async ({
+  invitationId,
+  userId,
+}: HandleInvitationInput) => {
   const invitation = await Invitation.findById(invitationId);
 
   if (!invitation) throw new AppError("Invitation not found!", 404);
@@ -74,10 +83,13 @@ export const reject = async (invitationId: string, userId: string) => {
   }
 
   invitation.status = "rejected";
-  return await invitation.save();
+  return invitation.save();
 };
 
-export const cancel = async (invitationId: string, userId: string) => {
+export const cancel = async ({
+  invitationId,
+  userId,
+}: HandleInvitationInput) => {
   const invitation = await Invitation.findById(invitationId);
 
   if (!invitation) throw new AppError("Invitation not found!", 404);
@@ -93,5 +105,5 @@ export const cancel = async (invitationId: string, userId: string) => {
     );
   }
 
-  return await Invitation.findByIdAndDelete(invitationId).lean();
+  return Invitation.findByIdAndDelete(invitationId).lean();
 };
