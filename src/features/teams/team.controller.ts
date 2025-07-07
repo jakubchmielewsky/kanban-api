@@ -15,14 +15,16 @@ export const getUserTeams = catchAsync(
   }
 );
 
-export const createTeam = catchAsync(async (req: Request, res: Response) => {
-  const ownerId = req.user?.id;
-  if (!ownerId) throw new AppError("You are not logged in", 401);
+export const createTeam = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const ownerId = req.user?.id;
+    if (!ownerId) return next(new AppError("You are not logged in", 401));
 
-  const input: CreateTeamInput = { ownerId, name: req.body.name };
-  const team = await create(input);
-  res.status(201).json({ status: "success", data: team });
-});
+    const input: CreateTeamInput = { ownerId, name: req.body.name };
+    const team = await create(input);
+    res.status(201).json({ status: "success", data: team });
+  }
+);
 
 export const updateTeam = catchAsync(async (req: Request, res: Response) => {
   const input: UpdateTeamInput = {

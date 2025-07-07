@@ -1,19 +1,29 @@
 import mongoose, { Document } from "mongoose";
 
-export default interface UserDocument extends Document {
+export interface User {
   _id: mongoose.Types.ObjectId;
   name: string;
   avatarUrl: string;
   isVerified: boolean;
-  verificationToken?: String;
+  verificationToken?: string;
   verificationTokenExpires?: Date;
+  passwordChangedAt?: Date;
+  passwordResetToken?: string;
+  passwordResetTokenExpires?: Date;
   email: string;
   password: string;
+  confirmPassword?: string;
   active: boolean;
-  passwordConfirm?: string;
+}
+
+export interface UserInstanceMethods {
   correctPassword(
     candidatePassword: string,
     userPassword: string
   ): Promise<boolean>;
   createVerificationToken(): string;
+  createPasswordResetToken(): string;
+  changedPasswordAfter(JWTTimestamp: number): boolean;
 }
+
+export type UserDocument = User & Document & UserInstanceMethods;

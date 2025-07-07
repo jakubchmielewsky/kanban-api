@@ -1,29 +1,42 @@
 import User from "../users/user.model";
 import { signToken } from "../../utils/jwt";
 import AppError from "../../utils/AppError";
-import { Response } from "express";
-import { LoginPayload, RegisterPayload } from "./auth.types";
+import {
+  LoginPayload,
+  RegisterPayload,
+  ResetPasswordPayload,
+} from "./auth.types";
 import { queueEmail } from "../emails/email.queue";
 import crypto from "crypto";
-import UserDocument from "../users/user.types";
+import { UserDocument } from "../users/user.types";
 
 const sendVerificationEmail = async (user: UserDocument) => {
   const verificationToken = user.createVerificationToken();
   await user.save({ validateBeforeSave: false });
 
-  await queueEmail({
-    to: user.email,
-    subject: "Verify your email",
-    html: `<p>Your verification token is: <strong>${verificationToken}</strong></p>`, //TODO: create a proper email template
-  });
+  try {
+    await queueEmail({
+      to: user.email,
+      subject: "Verify your email",
+      html: `<p>Click <a href="${process.env.CLIENT_URL}/verify-email?token=${verificationToken}">here</a> to verify your account</p>`, //TODO: create a proper email template
+    });
+  } catch (error) {
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    throw new AppError(
+      "There was an error sending the verification email. Try again later.",
+      500
+    );
+  }
 };
 
 export const registerUser = async ({
   email,
   password,
-  passwordConfirm,
+  confirmPassword,
 }: RegisterPayload) => {
-  const user = await User.create({ email, password, passwordConfirm });
+  const user = await User.create({ email, password, confirmPassword });
 
   await sendVerificationEmail(user);
 
@@ -32,8 +45,6 @@ export const registerUser = async ({
 
 export const resendVerificationEmail = async (email: string) => {
   const user = await User.findOne({ email });
-
-  console.log(user);
 
   if (!user) {
     throw new AppError("User not found", 404);
@@ -73,25 +84,68 @@ export const verifyUser = async (verificationToken: string) => {
   if (!user) {
     throw new AppError("Verification token is invalid or has expired", 400);
   }
-  if (user.isVerified) {
-    throw new AppError("User is already verified", 400);
-  }
 
   user.isVerified = true;
   user.verificationToken = undefined;
   user.verificationTokenExpires = undefined;
 
   await user.save({ validateBeforeSave: false });
+};
+
+export const forgotPasswordService = async (email: string) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  try {
+    await queueEmail({
+      to: user.email,
+      subject: "Password Reset",
+      html: `<p>Click <a href="${process.env.CLIENT_URL}/reset-password?token=${resetToken}">here</a> to reset your password</p>`, //TODO: create a proper email template
+    });
+  } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetTokenExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    throw new AppError(
+      "There was an error sending the email. Try again later.",
+      500
+    );
+  }
+};
+
+export const resetPasswordService = async ({
+  resetToken,
+  newPassword,
+  confirmNewPassword,
+}: ResetPasswordPayload) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetTokenExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new AppError("Reset token is invalid or has expired", 400);
+  }
+
+  user.password = newPassword;
+  user.confirmPassword = confirmNewPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpires = undefined;
+
+  await user.save();
 
   const token = signToken(user._id.toString());
 
   return { user, token };
-};
-
-export const logoutUser = (res: Response) => {
-  res.cookie("jwt", "loggedout", {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true,
-  });
-  res.status(200).json({ status: "success" });
 };
