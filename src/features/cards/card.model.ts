@@ -15,6 +15,11 @@ const cardSchema = new Schema<CardDocument>(
       ref: "List",
       required: [true, "Card must belong to a list"],
     },
+    boardId: {
+      type: Schema.Types.ObjectId,
+      ref: "Board",
+      required: [true, "Card must belong to a board"],
+    },
     teamId: {
       type: Schema.Types.ObjectId,
       ref: "Team",
@@ -34,6 +39,7 @@ const cardSchema = new Schema<CardDocument>(
 //TODO: in the future add assigned members and deadline date
 
 cardSchema.index({ listId: 1 });
+cardSchema.index({ boardId: 1 });
 
 cardSchema.pre("save", async function (next) {
   if (!this.isNew || (this.order !== undefined && this.order !== null)) {

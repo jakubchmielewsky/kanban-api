@@ -6,45 +6,40 @@ import crypto from "crypto";
 
 type UserModel = Model<User, {}, UserInstanceMethods>;
 
-const userSchema = new Schema<User, UserModel, UserInstanceMethods>(
-  {
-    email: {
-      type: String,
-      required: [true, "Email is required"],
-      trim: true,
-      lowercase: true,
-      validate: [validator.isEmail, "Please provide a valid email"],
-    },
-    name: String,
-    avatarUrl: String,
-    isVerified: { type: Boolean, default: false },
-    verificationToken: String,
-    verificationTokenExpires: Date,
-    passwordChangedAt: Date,
-    passwordResetToken: String,
-    passwordResetTokenExpires: Date,
-    active: { type: Boolean, default: true },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-      select: false,
-      minLength: [8, "Password must be at least 8 characters"],
-    },
-    confirmPassword: {
-      type: String,
-      required: true,
-      validate: {
-        validator: function (this, val) {
-          return val === this.password;
-        },
-        message: "Passwords do not match",
+const userSchema = new Schema<User, UserModel, UserInstanceMethods>({
+  email: {
+    type: String,
+    required: [true, "Email is required"],
+    trim: true,
+    lowercase: true,
+    validate: [validator.isEmail, "Please provide a valid email"],
+  },
+  name: String,
+  avatarUrl: String,
+  isVerified: { type: Boolean, default: false, select: false },
+  verificationToken: String,
+  verificationTokenExpires: Date,
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetTokenExpires: Date,
+  active: { type: Boolean, default: true, select: false },
+  password: {
+    type: String,
+    required: [true, "Password is required"],
+    select: false,
+    minLength: [8, "Password must be at least 8 characters"],
+  },
+  confirmPassword: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function (this, val) {
+        return val === this.password;
       },
+      message: "Passwords do not match",
     },
   },
-  {
-    timestamps: true,
-  }
-);
+});
 
 userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ name: 1 }, { unique: true });

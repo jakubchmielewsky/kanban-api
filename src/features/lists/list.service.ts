@@ -4,7 +4,7 @@ import { CreateListInput, UpdateListInput } from "./list.types";
 import { cascadeDeleteList } from "../../utils/cascadeDelete";
 
 export const findAll = async (boardId: string) => {
-  return await List.find({ boardId }).lean();
+  return await List.find({ boardId }).sort({ order: 1 }).lean();
 };
 
 export const create = async (data: CreateListInput) => {

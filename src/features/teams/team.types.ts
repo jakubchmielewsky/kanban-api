@@ -4,6 +4,7 @@ export interface CreateTeamInput {
 }
 
 export interface UpdateTeamInput {
-  teamId: string;
   name: string;
+  logo?: string;
+  description?: string;
 }

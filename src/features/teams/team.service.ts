@@ -22,6 +22,7 @@ export const findAll = async (userId: string) => {
     { $unwind: "$teamData" },
     {
       $project: {
+        _id: 0,
         teamId: 0,
         userId: 0,
         createdAt: 0,
@@ -60,12 +61,12 @@ export const create = async ({ ownerId, name }: CreateTeamInput) => {
   return team;
 };
 
-export const update = async ({ teamId, name }: UpdateTeamInput) => {
-  return Team.findByIdAndUpdate(
-    teamId,
-    { name },
-    { runValidators: true, new: true, lean: true }
-  );
+export const update = async (teamId: string, data: UpdateTeamInput) => {
+  return Team.findByIdAndUpdate(teamId, data, {
+    runValidators: true,
+    new: true,
+    lean: true,
+  });
 };
 
 export const remove = async (teamId: string) => {

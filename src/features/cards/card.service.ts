@@ -10,18 +10,8 @@ import {
   LabelCardInput,
 } from "./card.types";
 
-export const findAll = async (listId: string) => {
-  return Card.aggregate([
-    { $match: { listId: new mongoose.Types.ObjectId(listId) } },
-    {
-      $lookup: {
-        from: "labels",
-        localField: "labels",
-        foreignField: "_id",
-        as: "labels",
-      },
-    },
-  ]);
+export const findAll = async (boardId: string) => {
+  return Card.find({ boardId }).sort({ order: 1 }).lean();
 };
 
 export const findOne = async (cardId: string) => {
@@ -48,7 +38,7 @@ export const create = async ({
     teamId: card.teamId,
     performedBy: card.teamId.toString(),
     action: "create",
-    targetCardId: card._id,
+    cardId: card._id,
   });
   return card;
 };
@@ -65,15 +55,20 @@ export const update = async ({ cardId, updates, userId }: UpdateCardInput) => {
     teamId: card.teamId,
     performedBy: userId,
     action: "update",
-    targetCardId: card._id,
+    cardId: card._id,
   });
   return card;
 };
 
-export const move = async ({ cardId, targetListId, userId }: MoveCardInput) => {
+export const move = async ({
+  cardId,
+  targetListId,
+  newOrder,
+  userId,
+}: MoveCardInput) => {
   const card = await Card.findByIdAndUpdate(
     cardId,
-    { listId: targetListId },
+    { listId: targetListId, order: newOrder },
     { new: true, runValidators: true, lean: true }
   );
   if (!card) throw new AppError("Card not found", 404);
@@ -81,8 +76,8 @@ export const move = async ({ cardId, targetListId, userId }: MoveCardInput) => {
   await Activity.create({
     teamId: card.teamId,
     performedBy: userId,
-    action: "move_to_list",
-    targetCardId: card._id,
+    action: "move",
+    cardId: card._id,
   });
   return card;
 };
@@ -106,7 +101,7 @@ export const remove = async ({ cardId, userId }: RemoveCardInput) => {
     teamId: card.teamId,
     performedBy: userId,
     action: "delete",
-    targetCardId: card._id,
+    cardId: card._id,
   });
 };
 
@@ -122,7 +117,7 @@ export const addLabel = async ({ cardId, labelId, userId }: LabelCardInput) => {
     teamId: card.teamId,
     performedBy: userId,
     action: "add_label",
-    targetCardId: card._id,
+    cardId: card._id,
   });
   return card;
 };
@@ -143,7 +138,7 @@ export const removeLabel = async ({
     teamId: card.teamId,
     performedBy: userId,
     action: "remove_label",
-    targetCardId: card._id,
+    cardId: card._id,
   });
   return card;
 };

@@ -9,6 +9,7 @@ import listsRouter from "../lists/list.router";
 import { restrictToRoles } from "../../middlewares/restrictToRoles";
 import checkIfResourceBelongsToUsersTeam from "../../middlewares/checkIfResourceBelongsToTeam";
 import Board from "./board.model";
+import cardsRouter from "../cards/card.router";
 
 const boardsRouter = Express.Router({ mergeParams: true });
 
@@ -17,6 +18,7 @@ boardsRouter.use(
   checkIfResourceBelongsToUsersTeam(Board, "boardId")
 );
 
+boardsRouter.use("/:boardId/cards", cardsRouter);
 boardsRouter.use("/:boardId/lists", listsRouter);
 
 boardsRouter.get("/", getTeamBoards);

@@ -56,7 +56,7 @@ export const resendVerificationEmail = async (email: string) => {
 };
 
 export const loginUser = async ({ email, password }: LoginPayload) => {
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select("+password +isVerified");
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     throw new AppError("Incorrect email or password!", 401);

@@ -32,6 +32,7 @@ export interface UpdateCardInput {
 export interface MoveCardInput {
   cardId: string;
   targetListId: string;
+  newOrder: number;
   userId: string;
 }
 

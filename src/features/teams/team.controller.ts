@@ -27,11 +27,9 @@ export const createTeam = catchAsync(
 );
 
 export const updateTeam = catchAsync(async (req: Request, res: Response) => {
-  const input: UpdateTeamInput = {
-    teamId: req.params.teamId,
-    name: req.body.name,
-  };
-  const team = await update(input);
+  const teamId = req.params.teamId;
+  const { name, logo, description }: UpdateTeamInput = req.body;
+  const team = await update(teamId, { name, logo, description });
   res.status(200).json({ status: "success", data: team });
 });
 

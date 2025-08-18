@@ -40,7 +40,7 @@ app.use(cookieParser());
 
 //testing middleware
 app.use("/", (req, res, next) => {
-  //console.log("Data received:", req.body);
+  console.log("Data received:", req.body);
   //console.log("Cookies received:", req.cookies);
 
   next();

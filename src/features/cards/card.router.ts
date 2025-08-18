@@ -16,6 +16,7 @@ import Card from "./card.model";
 import List from "../lists/list.model";
 import Label from "../labels/label.model";
 import checklistsRouter from "../checklists/checklist.router";
+import Board from "../boards/board.model";
 
 const cardsRouter = Express.Router({ mergeParams: true });
 
@@ -24,12 +25,12 @@ cardsRouter.use("/:cardId/checklists", checklistsRouter);
 
 cardsRouter.get(
   "/",
-  checkIfResourceBelongsToUsersTeam(List, "listId"),
+  checkIfResourceBelongsToUsersTeam(Board, "boardId"),
   getBoardCards
 );
 cardsRouter.post(
   "/",
-  checkIfResourceBelongsToUsersTeam(List, "listId"),
+  checkIfResourceBelongsToUsersTeam(Board, "boardId"),
   createCard
 );
 cardsRouter.get(

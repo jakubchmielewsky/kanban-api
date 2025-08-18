@@ -14,7 +14,7 @@ const activitySchema = new mongoose.Schema({
   },
   action: {
     type: String,
-    enum: ["create", "update", "delete", "add_label", "remove_label"],
+    enum: ["create", "update", "delete", "add_label", "remove_label", "move"],
     required: [true, "Action is required"],
   },
   cardId: {
